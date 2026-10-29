@@ -1,4 +1,4 @@
-# Signup API v1 (prototype)
+# Signup API v1
 
 Every experience talks to the same HTTP contract. The API has no experience-specific branches, captcha logic, UI schema, or dependency on frontend files.
 
@@ -27,7 +27,7 @@ Irrelevant experience answers must not be added to this payload. New experiences
 
 ## Responses
 
-- `200`: `{"message":"Modtaget! ..."}` — accepted and logged, and delivered to Slack when `SLACK_WEBHOOK_URL` is configured; **not** persisted in a database or processed as membership.
+- `200`: `{"message":"Modtaget! ..."}` — signup received and delivered to hal9k via Slack when `SLACK_WEBHOOK_URL` is configured; also logged. The association handles the signup after delivery. In log-only development mode, the response explicitly states that Slack is not configured and the signup was only logged.
 - `502`: `{"error":"Din tilmelding kunne ikke sendes. Prøv igen senere."}` — Slack delivery failed or timed out. The signup was still logged. Retrying may duplicate a Slack notification if Slack accepted a request whose response was lost.
 - `422`: `{"error":"Kontrollér felterne.","fields":{"birthDate":"Brug en gyldig fødselsdato i formatet dd-mm-yyyy."}}`. Field keys match request properties. Experiences decide how to display/navigate to errors.
 - `400`: `{"error":"..."}` for malformed, oversized, unknown-field or trailing JSON.
@@ -38,4 +38,4 @@ API JSON responses use no-store caching. A caller must tolerate network errors a
 
 ## Data handling
 
-This API logs all valid submissions to stdout using structured JSON. If `SLACK_WEBHOOK_URL` is configured, it also posts all fields to Slack, synchronously with a five-second timeout. Without a webhook it remains log-only for development. Configure the secret at runtime, never in the frontend or image. Restrict log and Slack access and retention; use synthetic data until deployment data-handling decisions are made. No database, durable queue, email, rate limiting or real bot protection exists. The UI gates are jokes and do not secure the endpoint.
+This API logs all valid submissions to stdout using structured JSON. If `SLACK_WEBHOOK_URL` is configured, it also posts all fields to Slack, synchronously with a five-second timeout. Without a webhook it remains log-only for development. Configure the secret at runtime, never in the frontend or image. Restrict log and Slack access and retention. Use synthetic data for development and testing; production submissions are real signup requests. No database, durable queue, email, rate limiting or real bot protection exists. The UI gates are jokes and do not secure the endpoint.

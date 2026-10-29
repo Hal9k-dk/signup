@@ -276,7 +276,7 @@ textarea:focus-visible {
 #form-status:empty {
   display: none;
 }
-.prototype {
+.signup-note {
   font:
     11px/1.6 Arial,
     sans-serif;

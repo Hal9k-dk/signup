@@ -146,8 +146,8 @@ make test-browser           # against running complete server on localhost:8080
 
 Set `BASE_URL` for another complete server. Root tests check assembly/routing/API; landing tests discover the catalogue dynamically; each experience owns its interaction tests. To test one project's `make dev`, run its `make test-browser` (default BASE_URL is localhost:8080 at /). To test packaged output directly, set `BASE_URL=http://localhost:8080/experiences/<id>/` in that project's directory.
 
-## Prototype limitations
+## Signup handling and deployment considerations
 
-**Use synthetic data.** The shared API logs accepted personal information to stdout, including addresses, birthdates and messages. It does not store/process memberships or send email. Consent, retention, access control and abuse protection need real deployment decisions. UI gates are jokes, not authentication or bot protection. The standalone binary does not change that.
+Production submissions are real signup requests delivered to hal9k via Slack for handling by the association. Configure `SLACK_WEBHOOK_URL` in production. The shared API also logs personal information to stdout, including addresses, birthdates and messages. There is no application database, automated membership administration or email delivery. Restrict log and Slack access and retention, and establish consent and abuse-protection policies for deployment. UI gates are jokes, not authentication or bot protection. Use synthetic data for development and testing.
 
 Official logo, served unchanged: https://wiki.hal9k.dk/_media/planning/hal9k-logo-nofont-plain.svg.

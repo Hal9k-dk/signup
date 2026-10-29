@@ -85,9 +85,9 @@ func signupHandler(logger *slog.Logger, notify signupNotifier) http.HandlerFunc 
 			writeJSON(w, http.StatusUnprocessableEntity, map[string]any{"error": "Kontrollér felterne.", "fields": errs})
 			return
 		}
-		// Prototype only: this deliberately logs personal data. Do not enable in production.
+		// Retain the signup audit log; restrict access and retention of personal data.
 		logger.Info("signup received", "signup", input)
-		message := "Modtaget! Dine oplysninger er logget i denne prototype — ikke gemt som en indmeldelse."
+		message := "Modtaget i udviklingstilstand. Slack er ikke konfigureret, så indmeldelsen er kun logget."
 		if notify != nil {
 			if err := notify(r.Context(), input); err != nil {
 				logger.Error("signup Slack notification failed", "error", err)

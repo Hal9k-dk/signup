@@ -64,7 +64,7 @@ function showReview() {
   });
   terminal.writeln('');
   terminal.writeln('Skriv EDIT <nr> for at rette et felt, JA for at sende, RET forfra eller /afslut.');
-  terminal.writeln('Ved JA sendes oplysningerne til serveren, hvor de logges. Brug testdata.');
+  terminal.writeln('Ved JA sendes din indmeldelse til hal9k.');
 }
 
 async function sendSignup() {
@@ -95,7 +95,6 @@ async function sendSignup() {
     signup.answers = {};
     signup.state = 'welcome';
     terminal.writeln(result.message || 'Indmeldelsen er modtaget. Tak!');
-    terminal.writeln('Oplysningerne logges på serveren. Brug testdata.');
   } catch {
     signup.state = 'review';
     terminal.writeln('Forbindelsen fejlede. Dine svar er stadig på denne side.');
@@ -197,7 +196,7 @@ function handleInput(input) {
 terminal.writeln('HAL9K // TERMINAL FOR INDMELDELSE');
 terminal.writeln('----------------------------------');
 terminal.writeln('Velkommen! Her kan du begynde indmeldelsen.');
-terminal.writeln('Brug testdata: bekræftede oplysninger sendes og logges på serveren.');
+terminal.writeln('Her kan du sende din indmeldelse til hal9k.');
 terminal.writeln('Intet sendes, før du bekræfter med JA på gennemgangsskærmen.');
 terminal.writeln('Skriv INDMELD for at begynde eller HELP for hjælp.');
 terminal.writeln('');

@@ -77,6 +77,9 @@ func TestSignupAPI(t *testing.T) {
 				t.Fatalf("got %d, want %d: %s", res.Code, tc.status, res.Body.String())
 			}
 			if tc.status == 200 {
+				if !strings.Contains(res.Body.String(), "udviklingstilstand") {
+					t.Fatal("log-only response must identify development mode")
+				}
 				if !strings.Contains(logs.String(), `"firstName":"Ada"`) || !strings.Contains(logs.String(), `"message":"PROSA: 1234"`) {
 					t.Fatal("signup fields were not logged")
 				}

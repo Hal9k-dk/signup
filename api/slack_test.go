@@ -55,6 +55,15 @@ func TestSlackDelivery(t *testing.T) {
 			if calls != 1 || res.Code != want || !strings.Contains(logs.String(), "signup received") {
 				t.Fatalf("calls=%d status=%d logs=%s", calls, res.Code, logs.String())
 			}
+			if status == 200 {
+				var result map[string]string
+				if err := json.Unmarshal(res.Body.Bytes(), &result); err != nil {
+					t.Fatal(err)
+				}
+				if result["message"] != "Modtaget! Din tilmelding er sendt til foreningen." {
+					t.Fatalf("unexpected signup confirmation: %v", result)
+				}
+			}
 			if strings.Contains(logs.String(), server.URL) {
 				t.Fatal("webhook URL leaked into logs")
 			}

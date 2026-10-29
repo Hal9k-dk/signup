@@ -24,7 +24,7 @@ const questions = [
   {
     name: "email",
     title: "Hvad er din emailadresse?",
-    hint: "En adresse, vi faktisk kan kontakte dig på. I prototypen: brug testdata.",
+    hint: "En adresse, vi kan kontakte dig på om din indmeldelse.",
     type: "email",
     autocomplete: "email",
   },
