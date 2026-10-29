@@ -34,7 +34,7 @@ func TestAssemblyAndIndependentDevelopment(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, path := range []string{"/", "/app.js", "/signup-client.js", "/shared/hal9k-logo.svg", "/experiences/" + entry.ID + "/"} {
+		for _, path := range []string{"/", "/signup-client.js", "/shared/hal9k-logo.svg", "/experiences/" + entry.ID + "/"} {
 			res := httptest.NewRecorder()
 			handler.ServeHTTP(res, httptest.NewRequest("GET", path, nil))
 			if res.Code != 200 {
@@ -47,6 +47,20 @@ func TestAssemblyAndIndependentDevelopment(t *testing.T) {
 			}
 			if d.IsDir() {
 				return nil
+			}
+			relative, err := filepath.Rel(filepath.Join(root, entry.Project, "public"), path)
+			if err != nil {
+				return err
+			}
+			// FileServer redirects index.html to its containing directory.
+			url := "/" + filepath.ToSlash(relative)
+			if strings.HasSuffix(url, "/index.html") {
+				url = strings.TrimSuffix(url, "index.html")
+			}
+			res := httptest.NewRecorder()
+			handler.ServeHTTP(res, httptest.NewRequest("GET", url, nil))
+			if res.Code != 200 {
+				t.Errorf("%s %s: %d", entry.ID, url, res.Code)
 			}
 			if !strings.HasSuffix(path, ".js") && !strings.HasSuffix(path, ".html") && !strings.HasSuffix(path, ".css") {
 				return nil

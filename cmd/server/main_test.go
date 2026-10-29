@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"io/fs"
 	"log/slog"
 	"net/http/httptest"
 	"testing"
@@ -23,7 +24,19 @@ func TestEmbeddedAssembly(t *testing.T) {
 	}
 	paths := []string{"/", "/styles.css", "/app.js", "/shared/hal9k-logo.svg"}
 	for _, entry := range entries {
-		paths = append(paths, "/experiences/"+entry.ID+"/", "/experiences/"+entry.ID+"/app.js", "/experiences/"+entry.ID+"/signup-client.js")
+		paths = append(paths, "/experiences/"+entry.ID+"/")
+		err := fs.WalkDir(assets, "embedded/experiences/"+entry.ID, func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if !d.IsDir() && d.Name() != "index.html" {
+				paths = append(paths, path[len("embedded"):])
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 	for _, path := range paths {
 		res := httptest.NewRecorder()

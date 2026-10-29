@@ -72,6 +72,26 @@ The final server serves the signup API and static embedded files. It reads **no 
 
 Verified by copying only the executable to an unrelated directory and running browser tests against it.
 
+## Container image
+
+The GitHub Actions container workflow runs `make test` on pull requests and pushes to `master`. After successful checks on `master` (or a manual run on `master`), it rebuilds the executable inside a multi-stage Docker build and pushes the same image to GHCR with both tags:
+
+```text
+ghcr.io/hal9k-dk/signup:latest
+ghcr.io/hal9k-dk/signup:<full-commit-sha>
+```
+
+Use the SHA tag for deployments tied to a specific commit; `latest` moves with successful publishing runs. The workflow uses the repository's `GITHUB_TOKEN` with package write permission, so no additional publishing secret is required. Set the GHCR package visibility to public if unauthenticated pulls are needed.
+
+```sh
+docker run --rm -p 8080:8080 ghcr.io/hal9k-dk/signup:latest
+# Or build and run locally:
+docker build -t hal9k-signup .
+docker run --rm -p 8080:8080 hal9k-signup
+```
+
+The runtime image contains only the static executable, runs as a non-root user, and listens on port 8080 by default. It requires no volumes. Set `ADDR` if needed (and adjust the container port mapping). Images currently target `linux/amd64`.
+
 ## Adding an experience
 
 1. Create an independent project containing `public/index.html`, local CSS/JS/assets, tests, README and Makefile. Use directory-relative private asset paths.
