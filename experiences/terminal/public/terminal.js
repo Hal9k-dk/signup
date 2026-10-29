@@ -2,7 +2,7 @@
 // Output is paced as 2400 baud with 8N1 framing: 10 bits per character,
 // or approximately 240 displayed characters per second.
 class DumbTerminal {
-  constructor({ maxLines = 500, baudRate = 2400, bitsPerCharacter = 10 } = {}) {
+  constructor({ maxLines = Infinity, baudRate = 2400, bitsPerCharacter = 10 } = {}) {
     this.lines = [''];
     this.input = '';
     this.maxLines = maxLines;

@@ -252,7 +252,8 @@ canvas.addEventListener('keydown', (event) => {
     terminal.clear(); event.preventDefault(); return;
   }
   if (event.key === 'Enter') {
-    terminal.submit({ echo: signup.state === 'welcome' }); event.preventDefault();
+    // A dumb terminal echoes each submitted line into persistent scrollback.
+    terminal.submit({ echo: true }); event.preventDefault();
   } else if (event.key === 'Backspace') {
     terminal.input = terminal.input.slice(0, -1);
     terminal.onChange(); event.preventDefault();
