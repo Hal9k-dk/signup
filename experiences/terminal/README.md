@@ -1,6 +1,6 @@
 # terminal
 
-Independent CRT-rendered terminal signup experience. Owns everything in `public/` and `tests/`; it does not import frontend code from another experience. Output is paced at 2400 baud (8N1), and the terminal accepts simple line input.
+Independent CRT-rendered terminal signup experience. Owns everything in `public/` and `tests/`; it does not import frontend code from another experience. Output is paced at 2400 baud (8N1). Submitted input is echoed into scrollback, which is retained without a line-count cap; the visible screen scrolls normally as output grows. The terminal accepts simple line input.
 
 The Danish signup interview collects the shared signup API fields, validates email, Danish postal code, and a real non-future `dd-mm-yyyy` birth date, and offers `EDIT <number>` on the review screen. The user must confirm with `JA` before the private API adapter submits the documented signup payload. Server-side validation errors route back to the relevant field. This prototype API logs accepted personal data; **use synthetic data only**.
 
