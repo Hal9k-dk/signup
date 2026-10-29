@@ -20,6 +20,7 @@ test: assemble
 	$(MAKE) -C experiences/physics test
 	$(MAKE) -C experiences/frontpage98 test
 	$(MAKE) -C experiences/survey test
+	$(MAKE) -C experiences/terminal test
 
 test-browser:
 	node tests/browser.cjs
@@ -27,6 +28,7 @@ test-browser:
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/physics/ $(MAKE) -C experiences/physics test-browser
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/frontpage98/ $(MAKE) -C experiences/frontpage98 test-browser
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/survey/ $(MAKE) -C experiences/survey test-browser
+	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/terminal/ $(MAKE) -C experiences/terminal test-browser
 
 clean:
 	rm -rf bin cmd/server/embedded

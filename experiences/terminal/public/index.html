@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10130e">
+  <meta name="description" content="En terminalbaseret indmeldelsesoplevelse for hal9k.">
+  <link rel="icon" href="/shared/hal9k-logo.svg" type="image/svg+xml">
+  <title>Terminal / hal9k</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="monitor" aria-label="CRT terminal">
+    <canvas id="screen" tabindex="0" aria-label="Terminal screen"></canvas>
+    <div class="bezel" aria-hidden="true"></div>
+  </main>
+  <p class="hint">Klik på skærmen for at skrive · Enter sender · Ctrl+L rydder</p>
+  <script src="terminal.js"></script>
+  <script src="renderer.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
