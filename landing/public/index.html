@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Vælg din indmeldelse / hal9k</title>
+    <link rel="icon" href="/shared/hal9k-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a href="/" aria-label="hal9k forside"
+        ><img src="/shared/hal9k-logo.svg" width="180" height="66" alt="hal9k"
+      /></a>
+    </header>
+    <main>
+      <h1>Velkommen til indmeldelsen</h1>
+      <p>Vælg en af følgende indmeldelsesoplevelser:</p>
+      <ul class="experiences" id="experiences"></ul>
+      <p id="catalogue-status" role="status">Henter oplevelser…</p>
+      <button id="feeling-lucky" type="button" hidden>I'm feeling lucky</button>
+      <noscript><p>Oplevelsesvælgeren kræver JavaScript.</p></noscript>
+      <p class="prototype">
+        Prototype: Brug testdata. Oplysninger logges kun på serveren.
+      </p>
+    </main>
+  </body>
+</html>

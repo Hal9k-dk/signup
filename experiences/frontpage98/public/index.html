@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="generator" content="Definitely Not Microsoft FrontPage 98" />
+    <title>Velkommen til hal9k's hjemmeside!!!</title>
+    <link rel="icon" href="/shared/hal9k-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" type="module"></script>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="topbar">
+          ★ Du surfer nu på hal9k's officielle indmeldelsesside ★
+        </div>
+        <img
+          class="logo"
+          src="/shared/hal9k-logo.svg"
+          alt="hal9k"
+          width="280"
+          height="103"
+        />
+        <h1>Velkommen til hal9k!</h1>
+        <p class="subtitle">~ Et hackerspace på World Wide Web ~</p>
+        <nav>
+          <a href="/">[ Forside / vælg oplevelse ]</a> <span>|</span>
+          <a href="#signup-form">[ Indmeldelse ]</a> <span>|</span>
+          <a href="#webmaster">[ Webmaster ]</a>
+        </nav>
+        <div class="ticker">
+          <span
+            >*** NYT! Du kan nu melde dig ind direkte via Internettet! Fremtiden
+            er her! ***</span
+          >
+        </div>
+      </header>
+      <main>
+        <aside class="sidebar">
+          <div class="sidebar-title">:: Navigation ::</div>
+          <p>📁 <a href="/">Alle oplevelser</a></p>
+          <p>📝 <a href="#signup-form">Bliv medlem</a></p>
+          <hr />
+          <p class="under-construction">🚧<br />UNDER<br />CONSTRUCTION</p>
+          <p>Sidst opdateret:<br /><strong>03-09-1998*</strong></p>
+          <p class="small">* mentalt, i hvert fald.</p>
+          <hr />
+          <p>Du er besøgende nr.</p>
+          <div class="counter" aria-label="Dekorativ besøgstæller">001337</div>
+          <p class="small">(tælleren er lige så ægte som resten af 1998)</p>
+          <div class="badge">
+            BEST VIEWED WITH<br /><strong>ANY BROWSER</strong>
+          </div>
+        </aside>
+        <section class="content" aria-labelledby="form-title">
+          <div class="welcome">
+            <strong>Hej, kommende hal9k'er!</strong>
+            <p>
+              Har du lyst til at bygge, skille ad og møde andre nørder? Så er du
+              kommet til den rette hjemmeside!
+            </p>
+          </div>
+          <h2 id="form-title">Indmeldelsesformular</h2>
+          <p>
+            Udfyld dine personlige oplysninger, så kontakter vi dig om din
+            indmeldelse. Felter med <span class="required">*</span> skal
+            udfyldes.
+          </p>
+          <form id="signup-form">
+            <div class="form-row">
+              <label for="firstName"
+                >Fornavn(e) <span class="required">*</span></label
+              ><input
+                id="firstName"
+                name="firstName"
+                autocomplete="given-name"
+                maxlength="256"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="lastName"
+                >Efternavn(e) <span class="required">*</span></label
+              ><input
+                id="lastName"
+                name="lastName"
+                autocomplete="family-name"
+                maxlength="256"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="email">Email <span class="required">*</span></label
+              ><input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                maxlength="256"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="street"
+                >Vejnavn og nr. <span class="required">*</span></label
+              ><input
+                id="street"
+                name="street"
+                autocomplete="street-address"
+                maxlength="256"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="postalCode"
+                >Postnummer <span class="required">*</span></label
+              ><input
+                id="postalCode"
+                name="postalCode"
+                autocomplete="postal-code"
+                inputmode="numeric"
+                pattern="[0-9]{4}"
+                maxlength="4"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="city">By <span class="required">*</span></label
+              ><input
+                id="city"
+                name="city"
+                autocomplete="address-level2"
+                maxlength="256"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <label for="birthDate"
+                >Fødselsdato <span class="required">*</span></label
+              >
+              <div>
+                <input
+                  id="birthDate"
+                  name="birthDate"
+                  autocomplete="bday"
+                  inputmode="numeric"
+                  pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}"
+                  maxlength="10"
+                  placeholder="dd-mm-yyyy"
+                  aria-describedby="date-hint"
+                  required
+                /><small id="date-hint">I formatet dd-mm-yyyy</small>
+              </div>
+            </div>
+            <div class="form-row">
+              <label for="phone"
+                >Telefon nr. <span class="required">*</span></label
+              ><input
+                id="phone"
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                maxlength="256"
+                required
+              />
+            </div>
+            <fieldset>
+              <legend>Medlemsskab</legend>
+              <label
+                ><input
+                  type="radio"
+                  name="membership"
+                  value="ordinary"
+                  checked
+                />
+                Almindeligt medlem</label
+              ><label
+                ><input type="radio" name="membership" value="student" />
+                Studiemedlem</label
+              >
+            </fieldset>
+            <label class="message-label" for="message">Evt. besked</label
+            ><textarea
+              id="message"
+              name="message"
+              rows="4"
+              maxlength="1000"
+              aria-describedby="prosa-hint"
+            ></textarea
+            ><small id="prosa-hint"
+              >Hvis du vil have PROSA-rabat, så skriv dit medlemsnummer
+              her.</small
+            >
+            <div class="buttons">
+              <button id="submit-button" type="submit">
+                Send indmeldelse &gt;&gt;</button
+              ><button id="reset-form" type="reset">Ryd formular</button>
+            </div>
+            <p id="form-status" role="status" aria-live="polite"></p>
+            <p class="prototype">
+              OBS: Dette er en prototype! Brug testdata. Oplysningerne logges
+              kun på serveren.
+            </p>
+          </form>
+          <noscript
+            >JavaScript er nødvendigt for at sende formularen. Designet er fra
+            1998. Serveren er ikke.</noscript
+          >
+        </section>
+      </main>
+      <footer id="webmaster">
+        <hr />
+        <p>Tak fordi du besøgte vores hjemmeside!</p>
+        <p class="badges">
+          <span>HTML<br /><strong>POWERED</strong></span>
+          <span>NO COOKIES<br /><strong>JUST HACKERS</strong></span>
+          <span>MADE WITH<br /><strong>NOTEPAD*</strong></span>
+        </p>
+        <p class="small">* Og Go. Og en lille smule JavaScript.</p>
+        <p>© hal9k · <a href="/">Tilbage til oplevelserne</a></p>
+        <p class="small">Webmaster siger: “Det virker på min maskine.”</p>
+      </footer>
+    </div>
+  </body>
+</html>

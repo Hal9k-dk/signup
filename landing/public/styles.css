@@ -1,0 +1,75 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  background: Canvas;
+  color: CanvasText;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  width: min(640px, calc(100% - 40px));
+  margin: 56px auto;
+}
+header img {
+  display: block;
+  width: 150px;
+  height: auto;
+  padding: 6px 8px;
+  background: #f5f5f5;
+  border-radius: 3px;
+}
+main {
+  margin-top: 36px;
+}
+h1 {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1.25;
+  margin: 0 0 20px;
+}
+a {
+  color: LinkText;
+  text-underline-offset: 3px;
+}
+a:visited {
+  color: VisitedText;
+}
+.experiences {
+  padding-left: 24px;
+  margin: 24px 0;
+}
+.experiences li {
+  margin: 12px 0;
+}
+#feeling-lucky {
+  font:
+    bold 14px "Times New Roman",
+    serif;
+  color: #000;
+  padding: 8px 18px;
+  background: #c0c0c0;
+  border: 3px outset #eee;
+  border-radius: 0;
+  cursor: pointer;
+}
+#feeling-lucky:active {
+  border-style: inset;
+}
+[hidden] {
+  display: none !important;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid Highlight;
+  outline-offset: 5px;
+}
+.prototype {
+  margin-top: 40px;
+  font-size: 0.8rem;
+}
+@media (max-width: 600px) {
+  body {
+    margin-top: 32px;
+  }
+}

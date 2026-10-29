@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="Find dine mennesker. Bliv en del af vores hackerspace."
+    />
+    <title>Indmeldelse / hal9k</title>
+    <link rel="icon" href="/shared/hal9k-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="vendor/matter.min.js" defer></script>
+    <script src="stack-check.js" defer></script>
+    <script src="page-decay.js" defer></script>
+    <script src="app.js" type="module"></script>
+  </head>
+  <body>
+    <section class="denied" aria-labelledby="denied-title">
+      <span class="eyebrow">hal9k / SECURITY THEATRE DIVISION</span>
+      <p class="error-code">403</p>
+      <h1 id="denied-title">Access Denied<span>.</span></h1>
+      <p>Din fremtid er lys. Lidt for lys.</p>
+      <p>
+        Vi accepterer kun nye medlemmer med mørk tilstand som systemstandard.<br />Skift
+        dit systems tema til mørkt, og kom ind fra lyset.
+      </p>
+      <code>prefers-color-scheme: light → permission denied</code>
+      <p><a href="/">← Vælg en anden indmeldelsesoplevelse</a></p>
+    </section>
+
+    <div class="dark-app">
+      <header class="site-header shell">
+        <a class="wordmark" href="/" aria-label="hal9k forside">
+          <img
+            class="site-logo"
+            src="/shared/hal9k-logo.svg"
+            alt="hal9k"
+            width="280"
+            height="103"
+          />
+        </a>
+        <div class="header-status">
+          <span class="status-dot"></span> SYSTEM ONLINE
+          <a class="header-coordinate" href="/">← ALLE OPLEVELSER</a>
+        </div>
+      </header>
+
+      <main class="shell">
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <div class="eyebrow">
+              <span class="tiny-cross">+</span> PLADS TIL FLERE SKÆVE HJERNER
+            </div>
+            <h1 id="page-title">
+              Find dine<br />mennesker<span class="accent">_</span>
+            </h1>
+            <p class="intro-text">
+              Et sted at bygge, bryde og undre sig.<br />Bliv en del af vores
+              hackerspace. Ingen manual påkrævet.
+            </p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="art-cross cross-one">+</div>
+            <div class="art-cross cross-two">+</div>
+            <div class="wire-cube"><span>9</span></div>
+            <span class="art-label">FIG. 001 — WORK IN PROGRESS</span>
+          </div>
+        </section>
+
+        <div class="workspace">
+          <section class="form-panel" aria-labelledby="form-title">
+            <div class="panel-heading">
+              <span class="section-index">01 /</span>
+              <h2 id="form-title">Indmeldelse</h2>
+              <span class="panel-tag">HELLO, WORLD.</span>
+            </div>
+            <p class="section-description">
+              Udfyld dine oplysninger, så kontakter vi dig om din
+              indmeldelse.<br /><span class="muted"
+                >Felter med <span class="accent">*</span> er
+                obligatoriske.</span
+              >
+            </p>
+            <form id="signup-form">
+              <div class="field-grid">
+                <label
+                  >Fornavn(e) <span class="required">*</span
+                  ><input
+                    name="firstName"
+                    autocomplete="given-name"
+                    placeholder="Ada"
+                    required
+                    maxlength="256"
+                /></label>
+                <label
+                  >Efternavn(e) <span class="required">*</span
+                  ><input
+                    name="lastName"
+                    autocomplete="family-name"
+                    placeholder="Lovelace"
+                    required
+                    maxlength="256"
+                /></label>
+                <label class="full-width"
+                  >Email <span class="required">*</span
+                  ><input
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="dig@internettet.dk"
+                    required
+                    maxlength="256"
+                /></label>
+                <label class="full-width"
+                  >Vejnavn og nr. <span class="required">*</span
+                  ><input
+                    name="street"
+                    autocomplete="street-address"
+                    placeholder="Opfindergade 42"
+                    required
+                    maxlength="256"
+                /></label>
+                <label
+                  >Postnummer <span class="required">*</span
+                  ><input
+                    name="postalCode"
+                    autocomplete="postal-code"
+                    inputmode="numeric"
+                    pattern="[0-9]{4}"
+                    maxlength="4"
+                    placeholder="2200"
+                    required
+                /></label>
+                <label
+                  >By <span class="required">*</span
+                  ><input
+                    name="city"
+                    autocomplete="address-level2"
+                    placeholder="København N"
+                    required
+                    maxlength="256"
+                /></label>
+                <label
+                  >Fødselsdato <span class="required">*</span
+                  ><input
+                    name="birthDate"
+                    autocomplete="bday"
+                    inputmode="numeric"
+                    pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}"
+                    placeholder="dd-mm-yyyy"
+                    aria-describedby="date-hint"
+                    required
+                    maxlength="10"
+                  /><span class="field-hint" id="date-hint"
+                    >I formatet dd-mm-yyyy</span
+                  ></label
+                >
+                <label
+                  >Telefon nr. <span class="required">*</span
+                  ><input
+                    name="phone"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="+45 12 34 56 78"
+                    required
+                    maxlength="256"
+                /></label>
+              </div>
+              <fieldset class="membership">
+                <legend>Medlemsskab <span class="required">*</span></legend>
+                <div class="membership-options">
+                  <label class="radio-card"
+                    ><input
+                      type="radio"
+                      name="membership"
+                      value="ordinary"
+                      checked /><span
+                      ><strong>Almindeligt medlem</strong
+                      ><small>For den nysgerrige hjerne</small></span
+                    ><span class="radio-indicator"></span
+                  ></label>
+                  <label class="radio-card"
+                    ><input
+                      type="radio"
+                      name="membership"
+                      value="student" /><span
+                      ><strong>Studiemedlem</strong
+                      ><small>Byg videre på din viden</small></span
+                    ><span class="radio-indicator"></span
+                  ></label>
+                </div>
+              </fieldset>
+              <label class="message-label"
+                >Evt. besked <span class="optional">/ valgfrit</span
+                ><textarea
+                  name="message"
+                  rows="3"
+                  maxlength="1000"
+                  placeholder="Hvad nørder du med?"
+                ></textarea
+                ><span class="field-hint"
+                  >Vil du have PROSA-rabat? Skriv dit medlemsnummer her.</span
+                ></label
+              >
+              <div class="submit-section">
+                <p id="submit-hint">
+                  <span aria-hidden="true">↳</span> Løs tyngdekraften ved siden
+                  af for at sende.
+                </p>
+                <button id="submit-button" type="submit" disabled>
+                  <span>Send indmeldelse</span><span aria-hidden="true">↗</span>
+                </button>
+              </div>
+              <p id="form-status" role="status" aria-live="polite"></p>
+              <p class="privacy-note">
+                // Prototype: Oplysningerne logges kun på serveren. Brug
+                testdata.
+              </p>
+            </form>
+          </section>
+
+          <aside class="side-column">
+            <section class="challenge-panel" aria-labelledby="challenge-title">
+              <div class="panel-heading">
+                <span class="section-index">02 /</span
+                ><span class="panel-tag">HUMAN CHECK</span
+                ><span class="mini-dot"></span>
+              </div>
+              <h2 id="challenge-title">
+                Bevis, du er<br />lidt mærkelig<span class="accent">.</span>
+              </h2>
+              <p>
+                Ingen trafiklys. Ingen billeder af busser.<br />Bare dig og en
+                tvivlsom forståelse af fysik.
+              </p>
+              <div class="challenge-instructions">
+                <span class="instruction-symbol" aria-hidden="true">▧</span>
+                <p>
+                  Stabl de <strong>4 klodser</strong> oven på hinanden.<br />Lad
+                  tårnet stå frit i <strong>5 sekunder.</strong>
+                </p>
+              </div>
+              <div
+                id="physics-stage"
+                aria-label="Fysiklegeplads: træk de fire klodser med mus eller finger. Alternativt bruges knappen Byg med tastatur."
+              >
+                <div class="stage-grid"></div>
+                <span class="stage-caption"
+                  >GRAVITY: ON / DIGNITY: OPTIONAL</span
+                >
+              </div>
+              <div class="challenge-readout">
+                <span id="challenge-state" role="status" aria-live="polite"
+                  >VENTER PÅ ET LILLE MIRAKEL</span
+                ><span id="challenge-timer">0.0 / 5s</span>
+              </div>
+              <div class="progress-track">
+                <div id="challenge-progress"></div>
+              </div>
+              <div class="challenge-controls">
+                <button
+                  type="button"
+                  id="reset-challenge"
+                  title="Start forfra med fire nye klodser — også hvis de gamle er fløjet væk"
+                >
+                  ↻ Start forfra</button
+                ><button
+                  type="button"
+                  id="keyboard-build"
+                  title="Placér en klods ad gangen uden at trække"
+                >
+                  Byg med tastatur ↗
+                </button>
+              </div>
+              <p class="challenge-footnote">
+                Træk for at flytte · Slip for at teste din konstruktion.<br />Klodser
+                på afveje? Tryk Start forfra.
+              </p>
+            </section>
+            <section class="note-panel">
+              <span class="eyebrow">// DU BEHØVER IKKE VÆRE EKSPERT</span>
+              <p>
+                Du skal bare være nysgerrig.<br />Vi finder ud af resten sammen.
+              </p>
+              <div class="note-bottom">
+                <span class="little-spark" aria-hidden="true">✳</span
+                ><span>LESS CONSUMING.<br />MORE CREATING.</span>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </main>
+      <footer class="shell">
+        <span
+          >© hal9k
+          <span class="muted">/ Et hackerspace for mennesker.</span></span
+        ><span>BUILT WITH CURIOSITY <span class="accent">↗</span></span>
+      </footer>
+    </div>
+    <div id="debris-layer" aria-hidden="true"></div>
+    <div id="decay-controls" hidden role="region" aria-label="Sidekaos">
+      <span id="decay-message">TIDEN ER GÅET // SIDEN SKILLER SIG SELV AD</span>
+      <button type="button" id="toggle-decay">Ⅱ Pause kaos</button>
+      <button type="button" id="rebuild-page">↻ Genopbyg siden</button>
+    </div>
+    <noscript
+      ><p class="noscript">
+        JavaScript er nødvendigt til vores fysikeksperiment og formular.
+      </p></noscript
+    >
+  </body>
+</html>

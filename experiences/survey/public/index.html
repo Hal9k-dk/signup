@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>En ganske kort spørgeundersøgelse / hal9k</title>
+    <link rel="icon" href="/shared/hal9k-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header>
+      <a href="/">← Alle oplevelser</a
+      ><span>hal9k / Afdelingen for overflødige spørgsmål</span>
+    </header>
+    <main>
+      <p class="eyebrow">DIN MENING ER MEGET OBLIGATORISK</p>
+      <h1>En ganske kort* spørgeundersøgelse</h1>
+      <p class="intro">
+        * Kort i geologisk forstand. Ét spørgsmål ad gangen. Fordi vi kan.
+      </p>
+      <div id="survey" hidden>
+        <div class="progress-label">
+          <span id="step-count" aria-live="polite"></span
+          ><span>ISO 9001-ish</span>
+        </div>
+        <progress
+          id="progress"
+          value="0"
+          max="15"
+          aria-label="Besvarede trin"
+        ></progress>
+        <form id="signup-form" novalidate>
+          <div id="questions"></div>
+          <p id="form-status" role="status" aria-live="polite"></p>
+          <div class="navigation">
+            <button id="back" type="button">← Tilbage</button
+            ><button id="next" type="submit">Næste →</button>
+          </div>
+        </form>
+        <p id="success" role="status" tabindex="-1" hidden></p>
+      </div>
+      <noscript
+        >Denne oplevelse kræver JavaScript.
+        <a href="/">Vælg en anden oplevelse.</a></noscript
+      >
+      <p class="privacy">
+        Prototype: Brug testdata. Indmeldelsesoplysninger logges på serveren. De
+        irrelevante svar bliver kun på denne side og sendes ikke. Intet gemmes
+        ved genindlæsning.
+      </p>
+    </main>
+    <footer>
+      Ingen kartofler kom til skade under udarbejdelsen af denne formular.
+    </footer>
+  </body>
+</html>
