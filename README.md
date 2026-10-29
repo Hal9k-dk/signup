@@ -22,6 +22,7 @@ experiences/
   physics/                     Own public/, tests/, README and Makefile
   frontpage98/                 Own public/, tests/, README and Makefile
   survey/                      Own public/, tests/, README and Makefile
+  terminal/                    CRT renderer, 2400-baud terminal signup experience
 landing/                       Static chooser, own public/ and tests
 shared/                        Branding assets only; no shared frontend behaviour
 contracts/signup-api.md        HTTP contract between experiences and API
@@ -85,6 +86,7 @@ The landing page is static and fetches the catalogue via JavaScript. It follows 
 - **physics:** dark-mode gate, four-block Matter.js stack challenge, pointer/touch and keyboard placement, reset. Page dismantling begins after 15 minutes of active visible dark-mode time. Rebuild preserves form input; reduced-motion users start paused. Matter.js and its MIT license belong solely to this project.
 - **frontpage98:** classic bevelled form buttons, table-style rows, ticker, construction stripes and decorative counter. No physics or dark-mode gate.
 - **survey:** fifteen screens: all signup fields plus five required nonsense answers. Back navigation preserves answers; server validation returns to the relevant question. Nonsense answers stay in page memory and are never sent.
+- **terminal:** a CRT-rendered Danish signup interview with output paced at 2400 baud, review/edit support, and explicit confirmation before posting through its own API adapter.
 
 ## Checks
 
@@ -95,6 +97,7 @@ make -C landing test
 make -C experiences/physics test
 make -C experiences/frontpage98 test
 make -C experiences/survey test
+make -C experiences/terminal test
 ```
 
 Optional browser tests (Node + Playwright are development-only):

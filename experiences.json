@@ -1,5 +1,6 @@
 [
   {"id":"physics","title":"Tyngdekraft & tvivlsom sikkerhed","project":"experiences/physics"},
   {"id":"survey","title":"Den unødvendigt lange spørgeundersøgelse","project":"experiences/survey"},
-  {"id":"frontpage98","title":"FrontPage '98","project":"experiences/frontpage98"}
+  {"id":"frontpage98","title":"FrontPage '98","project":"experiences/frontpage98"},
+  {"id":"terminal","title":"HAL9K på 2400 baud","project":"experiences/terminal"}
 ]
