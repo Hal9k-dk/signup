@@ -5,6 +5,7 @@ COPY . .
 RUN make build
 
 FROM scratch
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /src/bin/hal9k-signup /hal9k-signup
 USER 65532:65532
 EXPOSE 8080

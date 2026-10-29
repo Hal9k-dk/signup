@@ -68,7 +68,7 @@ func TestSignupAPI(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var logs bytes.Buffer
-			handler := NewHandler(slog.New(slog.NewJSONHandler(&logs, nil)))
+			handler := newHandler(slog.New(slog.NewJSONHandler(&logs, nil)), nil)
 			req := httptest.NewRequest(tc.method, "/api/signup", strings.NewReader(tc.body))
 			req.Header.Set("Content-Type", tc.contentType)
 			res := httptest.NewRecorder()

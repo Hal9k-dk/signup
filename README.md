@@ -90,7 +90,22 @@ docker build -t hal9k-signup .
 docker run --rm -p 8080:8080 hal9k-signup
 ```
 
-The runtime image contains only the static executable, runs as a non-root user, and listens on port 8080 by default. It requires no volumes. Set `ADDR` if needed (and adjust the container port mapping). Images currently target `linux/amd64`.
+The runtime image contains the static executable and HTTPS CA certificates, runs as a non-root user, and listens on port 8080 by default. It requires no volumes. Set `ADDR` if needed (and adjust the container port mapping). Images currently target `linux/amd64`.
+
+### Slack notifications and runtime secrets
+
+Every valid signup is still logged. Set `SLACK_WEBHOOK_URL` at runtime to also send all signup fields to a Slack incoming webhook. Keep the webhook out of source, images, build arguments and GitHub Actions. If a webhook was shared publicly or in chat, rotate it first.
+
+```sh
+cp .env.example .env
+chmod 600 .env
+# Edit .env: SLACK_WEBHOOK_URL=<your newly rotated webhook URL>
+docker run --rm --env-file .env -p 8080:8080 ghcr.io/hal9k-dk/signup:latest
+```
+
+`.env` and `.env.*` are ignored by Git (except the placeholder `.env.example`) and excluded from Docker builds. Docker reads `.env` on the host and injects its values; the application does not read a `.env` file itself. For a directly run binary or `make dev`, export `SLACK_WEBHOOK_URL` in the process environment (or source a trusted, shell-compatible `.env` first).
+
+Slack delivery is synchronous with a five-second timeout. A completed signup returns success only after Slack accepts the notification. A failed Slack request returns HTTP 502, logs a redacted error, and leaves the signup in the existing stdout log. No automatic retries or durable queue exist; a manual retry may duplicate a notification if Slack accepted a request whose response was lost. With no webhook configured, a startup warning is logged and the API remains log-only for local development. **Set the webhook in production.** Restrict Slack channel access and retention: messages contain personal information, including birthdates, addresses and free-text messages.
 
 ## Adding an experience
 

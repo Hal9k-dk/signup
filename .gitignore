@@ -2,3 +2,6 @@
 /cmd/server/embedded/*
 !/cmd/server/embedded/placeholder.txt
 node_modules/
+.env
+.env.*
+!.env.example

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/mail"
+	"os"
 	"strings"
 	"time"
 )
@@ -62,7 +63,7 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 	_ = json.NewEncoder(w).Encode(value)
 }
 
-func signupHandler(logger *slog.Logger) http.HandlerFunc {
+func signupHandler(logger *slog.Logger, notify signupNotifier) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if contentType := strings.Split(r.Header.Get("Content-Type"), ";")[0]; contentType != "application/json" {
 			writeJSON(w, http.StatusUnsupportedMediaType, map[string]string{"error": "Forventede JSON."})
@@ -86,13 +87,32 @@ func signupHandler(logger *slog.Logger) http.HandlerFunc {
 		}
 		// Prototype only: this deliberately logs personal data. Do not enable in production.
 		logger.Info("signup received", "signup", input)
-		writeJSON(w, http.StatusOK, map[string]string{"message": "Modtaget! Dine oplysninger er logget i denne prototype — ikke gemt som en indmeldelse."})
+		message := "Modtaget! Dine oplysninger er logget i denne prototype — ikke gemt som en indmeldelse."
+		if notify != nil {
+			if err := notify(r.Context(), input); err != nil {
+				logger.Error("signup Slack notification failed", "error", err)
+				writeJSON(w, http.StatusBadGateway, map[string]string{"error": "Din tilmelding kunne ikke sendes. Prøv igen senere."})
+				return
+			}
+			message = "Modtaget! Din tilmelding er sendt til foreningen."
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"message": message})
 	}
 }
 
 // NewHandler serves only the shared signup API.
 func NewHandler(logger *slog.Logger) http.Handler {
+	var notify signupNotifier
+	if webhook := strings.TrimSpace(os.Getenv("SLACK_WEBHOOK_URL")); webhook != "" {
+		notify = configuredSlackNotifier(webhook)
+	} else {
+		logger.Warn("SLACK_WEBHOOK_URL is not set; signups will only be logged")
+	}
+	return newHandler(logger, notify)
+}
+
+func newHandler(logger *slog.Logger, notify signupNotifier) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/signup", signupHandler(logger))
+	mux.HandleFunc("POST /api/signup", signupHandler(logger, notify))
 	return mux
 }

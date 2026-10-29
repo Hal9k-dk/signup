@@ -3,3 +3,5 @@
 bin
 cmd/server/embedded
 **/node_modules
+**/.env
+**/.env.*
