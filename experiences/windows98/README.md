@@ -45,6 +45,8 @@ All default assets are same-origin. Missing/invalid publishing pointers or asset
 
 ## Development and export
 
+All controls live under **VM-værktøjer — CD, eksport og gendannelse**. Routine edits need no mode switch; **Avanceret — indlæs en anden maskine** contains the local raw-import entry point, with confirmation before discarding session changes. Publishing CLI instructions remain in this README, not a separate webpage panel.
+
 The default machine can be modified directly. Expand **VM-værktøjer**, mount a local software ISO (up to 800 MiB, loaded into RAM, never uploaded), copy/install the program and restart via Windows **Start → Shut Down → Restart**. Use small driver/software ISOs; upstream documents problems with Windows 9x and large CD images. Our pinned v86 needs synchronous ArrayBuffer CD mounting; File-backed async mounting was unreadable by the guest.
 
 Eject the CD, wait for installers/disk activity, open the desired welcome screen, then click **Eksporter overdragelse — disk + snapshot (.tar)**. It pauses once, captures `state.bin` and current `disk.img`, includes matching `handover.json` with checksums, BIOS/provenance/licences, and leaves the VM paused. Raw authoring uses the synchronous v2 handover. The active lazy default instead exports a publishing capture with the original `base-disk.img` and async overlays; finalize this capture into a new version to publish further changes. Its merged `disk.img` can cold-boot in raw authoring, but the async `state.bin` cannot be paired with that merged disk. Check the browser download completed before closing the page. Separate disk and state export buttons remain available, but the handover is recommended for a verified pair.

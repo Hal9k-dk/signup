@@ -54,6 +54,14 @@ test("active publishing snapshot and all lazy chunks match checksums", () => {
   }
   assert.equal(baseHash.digest('hex'), m.base_sha256);
 });
+test("controls use one tools panel with advanced local import, not a publishing walkthrough", () => {
+  const html = readFileSync(path.join(__dirname, "../public/index.html"), "utf8");
+  assert.equal((html.match(/class="vm-tools"/g) || []).length, 1);
+  assert.match(html, /id="tools-panel"/);
+  assert.match(html, /<details id="disk-panel">/);
+  assert.doesNotMatch(html, /id="publishing-panel"|node publish\.cjs prepare|Åbn udviklingstilstand/);
+  for (const id of ["export-handover", "reboot-vm", "open-author", "leave-author"]) assert(html.includes(`id="${id}"`));
+});
 test("networking is enabled by default, same-origin WISP with no external DNS or browser persistence", () => {
   assert.doesNotMatch(app, /localStorage|indexedDB|\/api\/signup|query.get\("network"\)/);
   assert.match(app, /net_device: \{/);

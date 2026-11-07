@@ -21,7 +21,7 @@ const base = (process.env.BASE_URL || "http://localhost:8080").replace(/\/$/, ""
     await page.goto(base);
     await page.waitForSelector('#screen-container[data-ready="true"]', { timeout: 90000 });
     await page.waitForSelector('#cd-drive[data-state="inserted"]');
-    await page.locator("details.vm-tools:not(#disk-panel):not(#publishing-panel) summary").click();
+    await page.locator('#tools-panel > summary').click();
     await page.click("#eject-iso");
     await page.waitForSelector('#cd-drive[data-state="empty"]');
     await page.click("#mount-iso");

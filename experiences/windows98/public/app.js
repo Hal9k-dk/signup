@@ -26,10 +26,10 @@
       const percent = Math.min(100, Math.floor(loaded / total * 100));
       loaderProgress.setAttribute("aria-valuenow", String(percent));
       loaderFill.style.width = `${percent}%`;
-      loaderDetail.textContent = `${percent} % — ${(loaded / 1024 / 1024).toFixed(1)} / ${(total / 1024 / 1024).toFixed(1)} MiB`;
+      loaderDetail.textContent = `${percent} % · ${(loaded / 1024 / 1024).toFixed(1)} / ${(total / 1024 / 1024).toFixed(1)} MiB`;
     } else {
       loaderProgress.removeAttribute("aria-valuenow");
-      loaderDetail.textContent = "Vent et øjeblik — din gemte session gendannes.";
+      loaderDetail.textContent = "Vent et øjeblik · din gemte session gendannes.";
     }
   }
   const release = document.getElementById("release");
@@ -50,6 +50,11 @@
   const diskForm = document.getElementById("disk-form");
   const diskControls = document.getElementById("disk-controls");
   const diskStatus = document.getElementById("disk-status");
+  for (const id of ["open-author", "leave-author"]) {
+    document.getElementById(id).addEventListener("click", event => {
+      if (!window.confirm("Skift maskine og kassér alle ikke-eksporterede ændringer?")) event.preventDefault();
+    });
+  }
   const publishDraft = query.get("publish") === "1";
   const publishedVersion = query.get("published");
   let publishingManifest = null;
@@ -61,7 +66,7 @@
     const context = emulator?.speaker_adapter?.audio_context;
     if (context?.state === "suspended" && emulator.is_running()) {
       context.resume().catch(() => {
-        status.textContent = "Lyden blev blokeret — klik på skrivebordet eller lydknappen for at prøve igen.";
+        status.textContent = "Lyden blev blokeret · klik på skrivebordet eller lydknappen for at prøve igen.";
       });
     }
   }
@@ -99,7 +104,7 @@
       await screen.requestPointerLock();
     } catch {
       releaseInput();
-      status.textContent = "Musefangst blev blokeret — klik på skrivebordet for at prøve igen.";
+      status.textContent = "Musefangst blev blokeret · klik på skrivebordet for at prøve igen.";
     } finally {
       capturePending = false;
     }
@@ -109,19 +114,19 @@
       emulator.mouse_set_status(true);
       emulator.keyboard_set_status(true);
       screen.dataset.captured = "true";
-      status.textContent = "Mus og tastatur fanget — tryk Esc for at slippe.";
+      status.textContent = "Mus og tastatur fanget · tryk Esc for at slippe.";
     } else {
       releaseInput();
       delete screen.dataset.captured;
       screen.blur();
       if (ready && !failed) status.textContent = emulator.is_running()
-        ? "Mus og tastatur sluppet — klik på skrivebordet for at fange igen."
+        ? "Mus og tastatur sluppet · klik på skrivebordet for at fange igen."
         : "Sat på pause.";
     }
   });
   document.addEventListener("pointerlockerror", () => {
     releaseInput();
-    if (ready) status.textContent = "Musefangst blev blokeret — klik på skrivebordet for at prøve igen.";
+    if (ready) status.textContent = "Musefangst blev blokeret · klik på skrivebordet for at prøve igen.";
   });
   function fail(reason) {
     if (failed) return;
@@ -150,7 +155,7 @@
       } else {
         emulator.run();
         pause.textContent = "Pause";
-        status.textContent = "Windows 98 kører — klik på skrivebordet.";
+        status.textContent = "Windows 98 kører · klik på skrivebordet.";
       }
     } catch { fail("Maskinen kunne ikke sættes på pause."); }
   });
@@ -208,7 +213,7 @@
     releaseInput();
     await emulator.stop();
     pause.textContent = "Fortsæt";
-    status.textContent = "Sat på pause — eksportér disk og snapshot før du fortsætter.";
+    status.textContent = "Sat på pause · eksportér disk og snapshot før du fortsætter.";
   }
   async function toolAction(action) {
     if (!ready || failed || toolBusy) return;
@@ -248,7 +253,7 @@
       await emulator.set_cdrom({ buffer: bytes });
       mountedISO = { name: "HAL9K-CD" };
       cdStatus.textContent = "CD indsat: HAL9K-CD";
-      driveState("inserted", "HAL9K-CD indsat — Windows AutoRun starter programmet.");
+      driveState("inserted", "HAL9K-CD indsat · Windows AutoRun starter programmet.");
       toolsStatus.textContent = "HAL9K-CD indsat automatisk. Hvis AutoRun er slået fra, åbn D:\\HAL9K.EXE inde i Windows.";
     } catch (reason) {
       driveState("error", "CD'en kunne ikke indsættes. Prøv Indsæt HAL9K-CD igen.");
@@ -478,8 +483,8 @@
         mute.disabled = !emulator.speaker_adapter?.audio_context;
         if (mute.disabled) mute.textContent = "Lyd ikke understøttet";
         status.textContent = authorMode
-          ? (diskOptions.initial_state ? "Snapshot gendannet pauset — tryk Fortsæt." : "Raw-maskinen starter — klik på skærmen.")
-          : "Windows 98 gendannet fra snapshot — klik på skrivebordet.";
+          ? (diskOptions.initial_state ? "Snapshot gendannet pauset · tryk Fortsæt." : "Raw-maskinen starter · klik på skærmen.")
+          : "Windows 98 gendannet fra snapshot · klik på skrivebordet.";
         if (publishingManifest) {
           document.getElementById("export-handover").textContent = "Eksporter publiceringsoverdragelse (.tar)";
           document.getElementById("load-state").disabled = true;
@@ -502,24 +507,21 @@
     start();
   }
   if (publishDraft) {
-    document.querySelector("h1").textContent = "Forbered hurtig publicering.";
-    document.querySelector("h1 + p").textContent = "Normal opstart med lazy-disk. Åbn velkomstskærmen, skub CD ud og eksportér publiceringsoverdragelse.";
     document.getElementById("export-handover").textContent = "Eksporter publiceringscapture (.tar)";
   }
   if (authorMode) {
     loader.hidden = true;
     viewport.setAttribute("aria-busy", "false");
     document.getElementById("author-reboot").hidden = false;
+    document.getElementById("tools-panel").open = true;
     document.getElementById("disk-panel").open = true;
     diskForm.hidden = false;
-    document.querySelector("h1").textContent = "Udvikl din Windows 98-maskine.";
-    document.querySelector("h1 + p").textContent = "Indlæs raw-disk fra QEMU, eller fortsæt fra en v86-overdragelse.";
     document.querySelector(".titlebar span").textContent = "Raw-disk / udvikling";
-    document.querySelector(".hint").textContent = "Klik på skærmen for lyd, mus og tastatur; Esc slipper. Diskændringer er kun i RAM — eksportér før genindlæsning eller lukning.";
+    document.querySelector(".hint").textContent = "Klik på skærmen for lyd, mus og tastatur; Esc slipper. Diskændringer er kun i RAM · eksportér før genindlæsning eller lukning.";
     document.getElementById("export-disk").textContent = "Eksporter raw-harddisk (.img)";
     restore.textContent = "Nulstil udviklingssession";
     restore.disabled = false;
-    status.textContent = "Vælg raw-disk nedenfor — firmware indlæses automatisk.";
+    status.textContent = "Vælg raw-disk nedenfor · firmware indlæses automatisk.";
     driveState("empty", "CD-drevet er tomt.");
     diskStatus.textContent = "QEMU skal være lukket før du indlæser disken. Maks. 1 GiB; ingen upload.";
     diskForm.addEventListener("submit", async (event) => {

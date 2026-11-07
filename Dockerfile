@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM golang:1-bookworm AS build
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends xorriso \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY . .
 RUN make build

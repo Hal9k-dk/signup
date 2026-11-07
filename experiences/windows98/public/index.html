@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Windows 98 — hal9k</title>
+  <title>Windows 98 · hal9k</title>
   <link rel="icon" href="/shared/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script defer src="vendor/libv86.js"></script>
@@ -15,10 +15,8 @@
 <body>
   <header><a href="/">← Alle oplevelser</a><span>hal9k / Windows 98</span></header>
   <main>
-    <h1>Vi fortsætter, hvor 1998 slap.</h1>
-    <p>En rigtig Windows 98-maskine i din browser. Vi gendanner hukommelsen — ingen opstart.</p>
     <section class="machine" aria-label="Windows 98 virtuel maskine">
-      <div class="titlebar">hal9k.exe — Windows 98 <span>Snapshot preview</span></div>
+      <div class="titlebar">hal9k.exe · Windows 98 <span>Tilbage til fremtiden</span></div>
       <div class="toolbar">
         <button id="pause" disabled>Pause</button>
         <button id="restore" disabled>Gendan snapshot</button>
@@ -33,7 +31,7 @@
             <div class="loader-body">
               <p id="loader-label" role="status" aria-live="polite">Forbereder Windows 98…</p>
               <div class="win98-progress" id="loader-progress" role="progressbar" aria-labelledby="loader-label" aria-valuemin="0" aria-valuemax="100" data-indeterminate="true"><div class="win98-progress-fill" id="loader-fill"></div></div>
-              <p class="loader-detail" id="loader-detail">Gendanner din gemte session — ingen Windows-opstart.</p>
+              <p class="loader-detail" id="loader-detail">Gendanner din gemte session · ingen Windows-opstart.</p>
             </div>
           </div>
         </div>
@@ -46,23 +44,21 @@
     </section>
     <div class="cd-drive" id="cd-drive" data-state="waiting" aria-label="Virtuelt CD-ROM-drev">
       <div class="drive-face" aria-hidden="true"><span class="drive-label">HAL9K · CD-ROM 24×</span><span class="drive-led"></span><div class="drive-slot"></div><div class="compact-disc"><span>HAL9K</span></div></div>
-      <p id="drive-status" role="status" aria-live="polite">Venter på Windows — CD'en indsættes automatisk.</p>
+      <p id="drive-status" role="status" aria-live="polite">Venter på Windows · CD'en indsættes automatisk.</p>
       <button id="insert-bundled" type="button" disabled>Indsæt HAL9K-CD igen</button>
     </div>
     <p id="error" role="alert" hidden></p>
     <button id="retry" hidden>Prøv igen</button>
     <p class="hint">Klik på skrivebordet for at aktivere lyd og fange mus og tastatur. Musen bliver inde i maskinen, indtil du trykker Esc. Ændringer gemmes ikke; et nyt besøg starter fra samme snapshot.</p>
-    <details class="vm-tools" id="publishing-panel">
-      <summary>Publicering — lille snapshot og lazy-disk</summary>
-      <p>Eksportér først raw-overdragelse. Kør <code>node publish.cjs prepare HANDOVER.tar VERSION</code> lokalt, åbn <a href="?publish=1">publiceringskladden</a>, lad Windows starte, åbn det ønskede program og eksportér publiceringscapture. Kør derefter <code>node publish.cjs finalize CAPTURE.tar VERSION</code>, test den versionerede restore og aktivér først derefter.</p>
-      <p>En publiceringscapture medtager den oprindelige basisdisk og snapshot-overlays. Den sammenlagte disk er til videre udvikling, ikke basis for snapshot-gendannelse. Kladdeopstart er ikke visitor-startup.</p>
-    </details>
-    <details class="vm-tools" id="disk-panel">
-      <summary>Udvikl maskinen — indlæs raw-disk fra QEMU</summary>
-      <p><a href="?author=1">Åbn udviklingstilstand</a> · <a href="?">Tilbage til standard-snapshot</a>. Skift af tilstand kasserer ikke-eksporterede ændringer. Udviklingstilstand henter ikke demoens disk eller snapshot.</p>
+    <details class="vm-tools" id="tools-panel">
+      <summary>VM-værktøjer · CD, eksport og gendannelse</summary>
+      <p>Udvikl direkte i maskinen her: indsæt en software-CD, installer i Windows og eksportér din session. Du behøver ikke skifte tilstand. Genindlæsning kasserer ikke-eksporterede ændringer.</p>
+      <details id="disk-panel">
+      <summary>Avanceret · indlæs en anden maskine</summary>
+      <p><a id="open-author" href="?author=1">Indlæs lokal raw-disk eller matchet overdragelse</a> · <a id="leave-author" href="?">Tilbage til standard-snapshot</a>. Skift af maskine kasserer ikke-eksporterede ændringer. Lokal import henter ikke standardens disk eller snapshot.</p>
       <form id="disk-form" hidden>
         <fieldset id="disk-controls">
-          <legend>Lokale filer — uploades ikke</legend>
+          <legend>Lokale filer · uploades ikke</legend>
           <p>Installer Windows i QEMU og luk Windows og QEMU rent ned. SeaBIOS og VGA BIOS medfølger her og indlæses automatisk.</p>
           <label>Komplet raw-harddisk (.img/.raw/.bin, maks. 1 GiB) <input id="disk-file" type="file" accept=".img,.raw,.bin" required></label>
           <label>Valgfrit matchet v86-snapshot (.bin, maks. 1,5 GiB) <input id="disk-state-file" type="file" accept=".bin"></label>
@@ -73,9 +69,7 @@
       </form>
       <p id="disk-status" role="status" aria-live="polite">Installer OS i QEMU, indlæs raw-disken her, og gem et v86-snapshot til hurtig start.</p>
       <p class="hint">Disken indlæses i RAM og ændres kun i denne session. Eksportér før lukning/genindlæsning. Brug disk.img, state.bin og handover.json fra samme overdragelse for at fortsætte udviklingen. Der kræves flere GiB ledig RAM; indlæs kun betroede filer uden personoplysninger.</p>
-    </details>
-    <details class="vm-tools">
-      <summary>VM-værktøjer — installer software og gem maskinen</summary>
+      </details>
       <p>Vælg en ISO fra din computer, åbn CD-drevet i Windows og kopier eller installer programmet. Filerne uploades ikke til serveren. Genstart om nødvendigt via Start → Shut Down → Restart inde i Windows.</p>
       <fieldset id="vm-tools" disabled>
         <legend>Installations-CD</legend>
@@ -92,7 +86,7 @@
 
         <hr>
         <p>Afslut installationen, vent på diskaktivitet og skub CD'en ud før eksport. Eksport sætter maskinen på pause og lader den være pauset. Overdragelsen gemmer et matchet disk/snapshot-par med checksums. Lazy-publicering medtager også den oprindelige basisdisk til snapshot-overlays.</p>
-        <button id="export-handover" type="button">Eksporter overdragelse — disk + snapshot (.tar)</button>
+        <button id="export-handover" type="button">Eksporter overdragelse · disk + snapshot (.tar)</button>
         <p>Én download med disk.img, state.bin, firmware og kompatibilitetsoplysninger med checksums til genindlæsning. Standardens lazy-capture publiceres med finalize; raw-udviklingens capture kan genindlæses direkte med handover.json. Maskinen forbliver pauset. Pakken opdaterer ikke automatisk det publicerede master-image og kan kræve over 1 GiB RAM.</p>
         <button id="save-state" type="button">Gem snapshot (.bin)</button>
         <button id="export-disk" type="button">Eksporter harddisk (.img, 512 MiB)</button>
@@ -102,7 +96,6 @@
       <p id="tools-status" role="status" aria-live="polite">Værktøjerne bliver tilgængelige, når Windows er indlæst.</p>
       <p class="hint">Ændringer er kun i denne browsersession. “Gendan snapshot” ovenfor eller genindlæsning nulstiller dem. Downloads ændrer ikke serverens master-image. Indlæs kun snapshots fra en betroet kilde med samme emulator og synkrone diskprofil. Snapshot-gendannelse erstatter også disken. Eksporter aldrig personoplysninger i et offentligt master-snapshot.</p>
     </details>
-    <aside><strong>Teknisk preview.</strong> HAL9K-programmet starter fra CD via Windows AutoRun. Indtast ikke rigtige personoplysninger under test. Bekræftet indmeldelse sendes til tilmeldings-API'et via den virtuelle netværksforbindelse og kan blive logget og sendt til Slack.</aside>
     <footer>Emulator: <a href="https://github.com/copy/v86">v86</a> · Disk og snapshot er vores egen QEMU/v86-forberedte Windows-installation og serveres lokalt. Windows 98 er proprietær Microsoft-software; demoens tilgængelighed giver ikke ret til redistribution.</footer>
     <noscript>Windows 98-emulatoren kræver JavaScript og WebAssembly.</noscript>
   </main>
