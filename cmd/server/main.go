@@ -10,6 +10,7 @@ import (
 	"hackerspace/signup/api"
 	"hackerspace/signup/internal/run"
 	"hackerspace/signup/internal/site"
+	"hackerspace/signup/internal/vmnetwork"
 )
 
 // Assemble assets before compiling: make build (or go generate ./cmd/server).
@@ -24,7 +25,9 @@ func newHandler(logger *slog.Logger) http.Handler {
 		panic(err)
 	}
 	mux := http.NewServeMux()
-	mux.Handle("/api/", api.NewHandler(logger))
+	apiHandler := api.NewHandler(logger)
+	mux.Handle("/api/", apiHandler)
+	mux.Handle("/vm/network/", vmnetwork.NewHandler(apiHandler))
 	mux.Handle("/", http.FileServer(http.FS(web)))
 	return site.Headers(mux)
 }

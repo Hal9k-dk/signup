@@ -79,13 +79,13 @@
       <p>Vælg en ISO fra din computer, åbn CD-drevet i Windows og kopier eller installer programmet. Filerne uploades ikke til serveren. Genstart om nødvendigt via Start → Shut Down → Restart inde i Windows.</p>
       <fieldset id="vm-tools" disabled>
         <legend>Installations-CD</legend>
-        <p>HAL9K-CD'en indsættes automatisk i demo-tilstand (manuelt i udviklingstilstand) og indeholder HAL9K.EXE, AUTORUN.INF og README.TXT. Du kan også vælge din egen ISO her. <a href="downloads/hal9k-test.iso" download>Download HAL9K-CD</a> (valgfrit).</p>
+        <p>HAL9K-CD'en indsættes automatisk i demo-tilstand (manuelt i udviklingstilstand) og indeholder HAL9K.EXE, HAL9K.INI, AUTORUN.INF og README.TXT. Du kan også vælge din egen ISO her. <a href="downloads/hal9k-test.iso" download>Download HAL9K-CD</a> (valgfrit).</p>
         <label>CD-image (.iso) <input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"></label>
         <button id="mount-iso" type="button">Indsæt CD</button>
         <button id="eject-iso" type="button">Skub CD ud</button>
         <p id="cd-status">Ingen installations-CD valgt.</p>
         <button id="ctrl-alt-del" type="button">Send Ctrl+Alt+Del</button>
-        <span id="author-reboot" hidden>
+        <span id="author-reboot">
           <button id="reboot-vm" type="button">Genstart VM (hård genstart)</button>
           <p>Brug normalt Start → Shut Down → Restart inde i Windows. Hård genstart bevarer den virtuelle disk, men kan miste ikke-skrevne data og beskadige filsystemet. Genindlæs ikke websiden for at genstarte.</p>
         </span>
@@ -102,7 +102,7 @@
       <p id="tools-status" role="status" aria-live="polite">Værktøjerne bliver tilgængelige, når Windows er indlæst.</p>
       <p class="hint">Ændringer er kun i denne browsersession. “Gendan snapshot” ovenfor eller genindlæsning nulstiller dem. Downloads ændrer ikke serverens master-image. Indlæs kun snapshots fra en betroet kilde med samme emulator og synkrone diskprofil. Snapshot-gendannelse erstatter også disken. Eksporter aldrig personoplysninger i et offentligt master-snapshot.</p>
     </details>
-    <aside><strong>Teknisk preview.</strong> HAL9K-programmet starter fra CD via Windows AutoRun. Indtast ikke rigtige personoplysninger under test. Gæsten har ingen netværksforbindelse eller forbindelse til tilmeldings-API'et endnu.</aside>
+    <aside><strong>Teknisk preview.</strong> HAL9K-programmet starter fra CD via Windows AutoRun. Indtast ikke rigtige personoplysninger under test. Bekræftet indmeldelse sendes til tilmeldings-API'et via den virtuelle netværksforbindelse og kan blive logget og sendt til Slack.</aside>
     <footer>Emulator: <a href="https://github.com/copy/v86">v86</a> · Disk og snapshot er vores egen QEMU/v86-forberedte Windows-installation og serveres lokalt. Windows 98 er proprietær Microsoft-software; demoens tilgængelighed giver ikke ret til redistribution.</footer>
     <noscript>Windows 98-emulatoren kræver JavaScript og WebAssembly.</noscript>
   </main>

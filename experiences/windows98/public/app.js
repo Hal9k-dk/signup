@@ -286,7 +286,6 @@
   }));
 
   document.getElementById("reboot-vm").addEventListener("click", () => toolAction(async () => {
-    if (!authorMode) throw new Error("Hård genstart er kun til raw-udviklingstilstand.");
     if (!window.confirm("Hård genstart af maskinen? Den virtuelle disk bevares, men Windows' ikke-skrevne data kan gå tabt og filsystemet kan beskadiges. Brug Windows' egen genstart, hvis den virker.")) return;
     await emulator.stop();
     emulator.restart();
@@ -463,7 +462,16 @@
         vga_memory_size: 8 * 1024 * 1024,
         screen_container: screen,
         ...diskOptions,
-        // Keep the NIC expected by the snapshot, but attach no relay/adapter.
+        // Each WISP guest is isolated. Preserve the restored MAC because Win98
+        // caches it in its driver; randomizing it silently breaks resumed traffic.
+        preserve_mac_from_state_image: true,
+        // Same-origin backend for the existing NE2000; keep matched hardware.
+        net_device: {
+          type: "ne2k",
+          relay_url: `${location.protocol === "https:" ? "wisps" : "wisp"}://${location.host}/vm/network/`,
+          dns_method: "static", // No external DoH; EXE uses virtual 192.168.86.2.
+          masquerade: false,
+        },
         disable_speaker: false,
         autostart: false,
       });

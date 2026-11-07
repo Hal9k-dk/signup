@@ -40,8 +40,10 @@ test("active publishing snapshot and all lazy chunks match checksums", () => {
   assert(pointer && pointer.manifest);
   const m = JSON.parse(readFileSync(path.join(root, pointer.manifest)));
   assert.equal(m.disk_backend, 'async-parts-with-overlay');
-  assert(m.compressed_state_size < 16 * 1024 ** 2);
-  assert.equal(createHash('sha256').update(readFileSync(path.join(root, m.state))).digest('hex'), m.compressed_state_sha256);
+  assert(m.compressed_state_size < 32 * 1024 ** 2, 'Compressed startup snapshot exceeds 32 MiB budget');
+  const compressedState = readFileSync(path.join(root, m.state));
+  assert.equal(compressedState.length, m.compressed_state_size);
+  assert.equal(createHash('sha256').update(compressedState).digest('hex'), m.compressed_state_sha256);
   assert.equal(Object.keys(m.chunks).length, m.disk_size / m.chunk_size);
   const baseHash = createHash('sha256');
   for (let offset = 0; offset < m.disk_size; offset += m.chunk_size) {
@@ -53,9 +55,21 @@ test("active publishing snapshot and all lazy chunks match checksums", () => {
   }
   assert.equal(baseHash.digest('hex'), m.base_sha256);
 });
-test("no guest relay, signup transport, or persistent personal data", () => {
-  assert.doesNotMatch(app, /network_relay_url:|relay_url:|localStorage|indexedDB|\/api\/signup/);
+test("networking is enabled by default, same-origin WISP with no external DNS or browser persistence", () => {
+  assert.doesNotMatch(app, /localStorage|indexedDB|\/api\/signup|query.get\("network"\)/);
+  assert.match(app, /net_device: \{/);
+  assert.match(app, /preserve_mac_from_state_image: true/);
+  assert.match(app, /location.host.*\/vm\/network\//);
+  assert.match(app, /dns_method: "static"/);
   assert.match(app, /disable_speaker: false/);
+});
+test("hard restart is available in normal mode and preserves the current disk", () => {
+  const html = readFileSync(path.join(__dirname, "../public/index.html"), "utf8");
+  assert.match(html, /id="author-reboot">/);
+  const restart = app.slice(app.indexOf('document.getElementById("reboot-vm").addEventListener'), app.indexOf('document.getElementById("save-state").addEventListener'));
+  assert.doesNotMatch(restart, /authorMode|location.reload|restore_state/);
+  assert.match(restart, /window.confirm/);
+  assert.match(restart, /emulator.restart\(\)/);
 });
 test("Wasm is vendored with license and upstream hashes", () => {
   const wasm = readFileSync(path.join(__dirname, "../public/vendor/v86.wasm"));

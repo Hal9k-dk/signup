@@ -1,6 +1,6 @@
 # Windows 98 — authored snapshot preview
 
-An independent v86 experience at `/experiences/windows98/`. The default page resumes the **user-authored Windows 98 master** from the active `win98-release-001` compressed snapshot with a lazy 256 KiB disk backend. `public/images/published.json` selects this immutable version; the full synchronous master is retained only for authoring/rollback, not downloaded on normal visits. It never falls back to a cold boot or the old copy.sh Windows demo. After restoration it automatically inserts the HAL9K CD. Guest AutoRun may launch `HAL9K.EXE`; the page has no launch acknowledgement or signup API bridge.
+An independent v86 experience at `/experiences/windows98/`. The default page resumes the **user-authored Windows 98 master** from the selected compressed snapshot with a lazy 256 KiB disk backend. `public/images/published.json` selects this immutable version; the full synchronous master is retained only for authoring/rollback, not downloaded on normal visits. It never falls back to a cold boot or the old copy.sh Windows demo. After restoration it automatically inserts the HAL9K CD. Guest AutoRun may launch `HAL9K.EXE`; the page has no launch acknowledgement. The CD's `HAL9K.INI` configures the signup API through the virtual WISP network.
 
 ## Repeatable fast-publishing pipeline
 
@@ -19,18 +19,21 @@ Prepare validates the raw handover's disk/hardware/build/firmware, splits the di
 
 Publishing capture pauses and exports the original `base-disk.img`, current merged `disk.img`, async `state.bin` with write overlays, manifest/checksums and firmware. **The original base must stay matched to the overlay state.** Finalize validates the capture, creates an immutable version directory, compresses the state using zstd and reports compressed size. It does not activate unless explicitly requested (`--activate` is available, but separate test/activation is recommended). The full archive is for handover/rollback; visitors fetch only the compressed state and needed disk chunks, not the merged disk or raw full state. `disk.img` from an async capture can be imported alone into raw authoring for further editing/cold boot; do not pair it with the async state in the raw form.
 
-`public/images/published.json` now selects `publishing/win98-release-001/manifest.json`. Activation atomically points it at a finalized version. Once active, missing/corrupt publishing state errors rather than falling back to the large raw master. Use `activate OLD_VERSION` for rollback; keep immutable version assets and source handovers. Generated publishing directories are ignored by git but included by the existing public-file packager. Runtime state/BIOS hashes and offline disk chunk hashes are checked; lazy disk reads use the pinned v86 loader. They can still stall if a required chunk is missing. Do not mutate version contents; configure production caching appropriately.
+`public/images/published.json` is the sole source of truth for the active version. Its `manifest` field points to `publishing/VERSION/manifest.json`. Activation atomically points it at a finalized version; do not duplicate the active version name in documentation. Once active, missing/corrupt publishing state errors rather than falling back to the large raw master. Use `activate OLD_VERSION` for rollback; keep immutable version assets and source handovers. Generated publishing directories are ignored by git but included by the existing public-file packager. Runtime state/BIOS hashes and offline disk chunk hashes are checked; lazy disk reads use the pinned v86 loader. They can still stall if a required chunk is missing. Do not mutate version contents; configure production caching appropriately.
 
 `make test-raw-browser` also exercises prepare → real async BIOS boot → publishing capture → finalize/zstd → lazy restore with a tiny test disk. The supplied Windows publishing capture has passed real Chromium fresh restore, graphical display, pause/resume, pointer lock/release, reload and missing-state/CD failure checks. It reached VM-ready in 451 ms on the local unthrottled server; this is not a WAN performance guarantee. This first pipeline does not yet record/prefetch a startup working set or measure constrained-network performance; those should follow actual snapshot size and startup-I/O measurements.
 
-## Active lazy master
+## Inspect the active lazy master
 
-Finalized from `/tmp/hal9k-windows98-publishing-handover.tar` as `public/publishing/win98-release-001/`:
+Read `public/images/published.json`, then open the file named by its `manifest` field relative to `public/`. From this directory, this command prints the selected manifest, snapshot size and base disk size:
 
-- `state.bin.zst`: **11.79 MiB**, from a 40,603,252-byte async snapshot.
-- `disk/`: 2,048 immutable 256 KiB parts (512 MiB base disk), fetched only on demand.
-- `manifest.json`: base/chunk/state/firmware/build hashes; snapshot includes disk-write overlays against this exact base.
-- `images/published.json`: activation pointer. Missing published assets do not silently fall back.
+```sh
+node -e 'const fs=require("node:fs"); const p=JSON.parse(fs.readFileSync("public/images/published.json")); const m=JSON.parse(fs.readFileSync("public/"+p.manifest)); console.log({manifest:p.manifest, snapshotMiB:m.compressed_state_size/1024**2, diskMiB:m.disk_size/1024**2});'
+```
+
+On a deployed site, inspect `/experiences/windows98/images/published.json` (or `/images/published.json` in standalone development mode), then follow its manifest path relative to the experience URL. Browser DevTools Network shows which version a particular tab loaded; an existing tab may still be using a previous selection. `?published=VERSION` explicitly overrides the default for testing.
+
+Each immutable version contains `state.bin.zst`, on-demand 256 KiB base disk chunks and `manifest.json` with size/base/chunk/state/firmware/build hashes. The snapshot's disk-write overlays must remain paired with that exact base. Missing published assets do not silently fall back.
 
 ## Retained raw authoring master
 
@@ -82,9 +85,9 @@ The local source file is never modified; all guest writes stay in browser RAM. W
 
 ## Controls, test CD and checks
 
-Click the display to unlock browser audio and capture mouse/keyboard with Pointer Lock. Escape, release, pause, blur and hiding the tab release input. Muting, fullscreen and aspect-preserving narrow-page scaling are supported. No networking relay, signup API bridge or persistent disk storage is attached.
+Click the display to unlock browser audio and capture mouse/keyboard with Pointer Lock. Escape, release, pause, blur and hiding the tab release input. Muting, fullscreen and aspect-preserving narrow-page scaling are supported. Networking is enabled by default through the same-origin WISP gateway described below. No persistent disk storage is attached.
 
-`public/downloads/hal9k-test.iso` (volume `HAL9K_TEST`) contains `HAL9K.EXE`, `AUTORUN.INF`, `README.TXT` from `test-cd/`. Default visits insert it automatically; authoring offers manual insertion. If AutoRun is disabled, run `D:\HAL9K.EXE`. A failed CD fetch leaves Windows usable with retry. Root `make assemble`/`make build` regenerate the ISO using xorriso; standalone `make test-iso` does the same.
+`public/downloads/hal9k-test.iso` (volume `HAL9K_TEST`) contains `HAL9K.EXE`, `HAL9K.INI`, `AUTORUN.INF`, `README.TXT` from `test-cd/`. Default visits insert it automatically; authoring offers manual insertion. If AutoRun is disabled, run `D:\HAL9K.EXE`. A failed CD fetch leaves Windows usable with retry. Root `make assemble`/`make build` regenerate the ISO using xorriso; standalone `make test-iso` does the same.
 
 ```sh
 make dev                  # standalone Go dev host at /
@@ -103,4 +106,19 @@ Playwright is development-only. Set NODE_PATH as described in root README and op
 
 Windows 98, included programs and potentially drivers are proprietary or separately licensed. Possession of installer media is not permission for public browser redistribution. Before publication, distribution of the embedded executable/container, or production deployment, establish rights to **all master contents**, including VBEMP if installed, and firmware corresponding-source obligations. Preserve licence/provenance files. Never capture real personal data in the master.
 
-HAL9K.EXE is currently an offline test with no personal-data transport. A future bounded, validated guest serial bridge to same-origin `/api/signup` is not implemented.
+HAL9K.EXE is built from `https://github.com/Hal9k-dk/hal9k-signup-win98` using its upstream Makefile; source commit/build details are in `signup-exe-provenance.json`. Rebuild that pinned source with `make` (requires i686 MinGW GCC/windres), copy `hal9k.exe` to `test-cd/hal9k.exe`, preserve `test-cd/HAL9K.INI`, then run `make test-iso`. The INI's public virtual URL is not a secret; never add a direct Slack webhook. The wizard requires confirmation before sending. CD changes do not require replacing the matched VM snapshot.
+
+## Networking
+
+Networking is enabled automatically in normal and authoring modes; no networking query parameter is needed. Run the Go development host (`make dev`) or the assembled Go server. The existing NE2000 card attaches to `/vm/network/` using WISP v1 over same-origin WebSocket, encrypted as WSS on HTTPS deployments. No disk/snapshot or hardware profile has been changed. Windows driver/TCP-IP setup still needs guest-side verification.
+
+Snapshot restore uses `preserve_mac_from_state_image: true`: v86 otherwise randomizes the NIC MAC while Windows keeps its cached address, breaking resumed networking. Sharing the saved MAC is appropriate here because each WISP guest is isolated (do not use this unchanged on a shared Ethernet relay). See upstream `docs/networking.md`, "v86 run-time state images". The user verified guest ping and Internet Explorer `/health` before capture; repeat `/health` on a fresh restore after frontend changes. Existing TCP connections/ARP/DHCP state can be stale; retry with a new HTTP connection and, if needed, use `winipcfg` to release/renew the adapter lease. Ping is answered by v86 locally and does not prove Go tunnel connectivity.
+
+The Go gateway implements a **TCP-only restricted subset**, compatible with the bundled v86 WISP client, not a general WISP/Internet proxy. Only `192.168.86.2:80` exists; it is virtual, with no outbound dialing or DNS. Guest DNS uses v86's static responder, not external DoH. Configure Windows TCP/IP through DHCP; a Winsock/WinINet client should use:
+
+- `GET http://192.168.86.2/health` — connectivity probe, no personal data.
+- `POST http://192.168.86.2/api/signup` — existing JSON contract in `../../contracts/signup-api.md`, including validation/error responses. Guest HTTP is carried inside browser-to-server TLS; Windows needs no modern TLS stack.
+
+One HTTP request per stream; responses close the connection. Limits: 64 concurrent WebSockets per handler, four streams each, 32 KiB aggregate input per stream, 16-packet input window, 30-second stream and 30-minute session deadlines. Same-origin upgrades only. No guest URL selection, UDP, external relay or arbitrary proxying. Actual submissions use the real shared API and its logging/Slack semantics; require user confirmation and never automatically retry. Do not export images/snapshots containing personal data.
+
+`go test -race ./internal/vmnetwork` exercises framing, destination/route restrictions, HTTP, validation-response passthrough, flow control and origin rejection. `make test-network-browser` needs a running Go host and verifies the **actual vendored v86 WISP adapter**, restored VM and CSP against Go. It sends synthetic adapter-side requests, not guest Winsock traffic. Windows driver/DHCP/guest requests and the new EXE remain to be tested; adapter connectivity alone does not establish end-to-end guest signup support. Cloudflare must pass WebSocket upgrades at `/vm/network/`; a challenge page cannot be handled inside Windows.

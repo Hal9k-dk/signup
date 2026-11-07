@@ -14,6 +14,7 @@ import (
 	"hackerspace/signup/api"
 	"hackerspace/signup/internal/run"
 	"hackerspace/signup/internal/site"
+	"hackerspace/signup/internal/vmnetwork"
 )
 
 func main() {
@@ -43,6 +44,7 @@ func main() {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/api/", apiHandler)
+	mux.Handle("/vm/network/", vmnetwork.NewHandler(apiHandler))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		frontend.ServeHTTP(w, r)

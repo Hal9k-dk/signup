@@ -14,6 +14,10 @@ test:
 test-browser:
 	node tests/browser.cjs
 
+.PHONY: test-network-browser
+test-network-browser:
+	node tests/network-browser.cjs
+
 .PHONY: test-raw-browser
 test-raw-browser:
 	node tests/raw-browser.cjs
