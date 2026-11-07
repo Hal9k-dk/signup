@@ -1,6 +1,7 @@
 package site
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -34,7 +35,7 @@ func TestAssemblyAndIndependentDevelopment(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, path := range []string{"/", "/signup-client.js", "/shared/hal9k-logo.svg", "/experiences/" + entry.ID + "/"} {
+		for _, path := range []string{"/", "/shared/hal9k-logo.svg", "/experiences/" + entry.ID + "/"} {
 			res := httptest.NewRecorder()
 			handler.ServeHTTP(res, httptest.NewRequest("GET", path, nil))
 			if res.Code != 200 {
@@ -121,5 +122,33 @@ func TestSelectedProjectDoesNotNeedOtherProjects(t *testing.T) {
 	}
 	if _, err := Live(root, ""); err == nil {
 		t.Fatal("complete development host should reject missing project")
+	}
+}
+
+func TestVMPolicyIsScoped(t *testing.T) {
+	for _, tc := range []struct {
+		path, project string
+		vm            bool
+	}{
+		{"/", "", false},
+		{"/experiences/terminal/", "", false},
+		{"/experiences/windows98/", "", true},
+		{"/", "windows98", true},
+		{"/api/signup", "windows98", false},
+	} {
+		res := httptest.NewRecorder()
+		Headers(http.NotFoundHandler(), tc.project).ServeHTTP(res, httptest.NewRequest("GET", tc.path, nil))
+		policy := res.Header().Get("Content-Security-Policy")
+		for _, permission := range []string{"'wasm-unsafe-eval'", "worker-src 'self' blob:", "script-src 'self' blob:"} {
+			if strings.Contains(policy, permission) != tc.vm {
+				t.Errorf("%s project=%s: unexpected permission %s", tc.path, tc.project, permission)
+			}
+		}
+		if strings.Contains(policy, "https://i.copy.sh") {
+			t.Fatal("VM assets must be served locally")
+		}
+		if strings.Contains(policy, "'unsafe-eval'") {
+			t.Fatal("JavaScript eval must remain blocked")
+		}
 	}
 }

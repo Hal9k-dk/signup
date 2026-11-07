@@ -7,6 +7,7 @@ api:
 	go run ./cmd/api
 
 assemble:
+	$(MAKE) -C experiences/windows98 test-iso
 	go run ./cmd/package
 
 build: assemble
@@ -21,6 +22,7 @@ test: assemble
 	$(MAKE) -C experiences/frontpage98 test
 	$(MAKE) -C experiences/survey test
 	$(MAKE) -C experiences/terminal test
+	$(MAKE) -C experiences/windows98 test
 
 test-browser:
 	node tests/browser.cjs
@@ -29,6 +31,7 @@ test-browser:
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/frontpage98/ $(MAKE) -C experiences/frontpage98 test-browser
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/survey/ $(MAKE) -C experiences/survey test-browser
 	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/terminal/ $(MAKE) -C experiences/terminal test-browser
+	BASE_URL=$${BASE_URL:-http://localhost:8080}/experiences/windows98/ $(MAKE) -C experiences/windows98 test-browser
 
 clean:
 	rm -rf bin cmd/server/embedded

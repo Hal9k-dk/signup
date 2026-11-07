@@ -1,0 +1,15 @@
+{
+  "project": "https://github.com/copy/v86",
+  "downloaded": "2026-11-05",
+  "demoVersion": "1e4f43c95 (as reported by copy.sh/v86 at inspection time)",
+  "note": "Release binaries downloaded together from copy.sh; the demo version is not a verified source-to-binary mapping. Keep this tested JS/Wasm pair together.",
+  "sources": {
+    "libv86.js": "https://copy.sh/v86/build/libv86.js",
+    "v86.wasm": "https://copy.sh/v86/build/v86.wasm"
+  },
+  "sha256": {
+    "libv86.js": "b80fba71dacb7977e5b46800b3ba194bba7fe13e52fa3d22f80cc060ff015a4e",
+    "v86.wasm": "abd512988f39f5c81d4930f564bafa1a6e1e0d5210de9b20e2bdec13fbc318d9"
+  },
+  "license": "V86-LICENSE.txt"
+}

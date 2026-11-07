@@ -1,10 +1,10 @@
 # hal9k signup monorepo
 
-Independent signup experiences, one shared Go API, **one final executable containing every asset**. No runtime Node, CDN, database or frontend build tool is needed.
+Independent signup experiences, one shared Go API, **one final executable containing every asset**, including the Windows 98 preview's locally stored disk and snapshot. No runtime Node, CDN, database or frontend build tool is needed. Windows 98 is proprietary and not licensed by v86; see `experiences/windows98/README.md` before distributing or deploying it.
 
 ## Quick start
 
-Go 1.23+ and Make:
+Go 1.23+ and Make. Assembly/build/tests also require `xorriso` to regenerate the Windows 98 CD (`apt-get install xorriso` or `pacman -S xorriso`):
 
 ```sh
 make dev             # http://localhost:8080; live source + real signup API
@@ -122,6 +122,8 @@ The landing page is static and fetches the catalogue via JavaScript. It follows 
 - **frontpage98:** classic bevelled form buttons, table-style rows, ticker, construction stripes and decorative counter. No physics or dark-mode gate.
 - **survey:** fifteen screens: all signup fields plus five required nonsense answers. Back navigation preserves answers; server validation returns to the relevant question. Nonsense answers stay in page memory and are never sent.
 - **terminal:** a CRT-rendered Danish signup interview with output paced at 2400 baud, review/edit support, and explicit confirmation before posting through its own API adapter.
+
+- **windows98:** real v86 Windows 98 desktop resumed from a memory snapshot, with pause/resume, keyboard release and fresh restore. Technical preview only: no guest signup program yet. Uses a user-authored QEMU/v86 disk and matched memory snapshot, with local raw-disk authoring and handover export; the old copy.sh OS assets are removed. Production/distribution rights must be resolved. See `experiences/windows98/README.md`.
 
 ## Checks
 

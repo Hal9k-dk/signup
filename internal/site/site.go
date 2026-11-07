@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type Experience struct {
@@ -135,11 +136,20 @@ func copyTree(source, dest string) error {
 }
 
 // Headers applies the same browser policy to development and the final binary.
-func Headers(next http.Handler) http.Handler {
+func Headers(next http.Handler, project ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "no-referrer")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+		policy := "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+		// Only the VM experience needs Wasm compilation and blob workers.
+		// The optional project identifies independent development mode.
+		vm := strings.HasPrefix(r.URL.Path, "/experiences/windows98/") ||
+			(len(project) > 0 && project[0] == "windows98" && !strings.HasPrefix(r.URL.Path, "/api/"))
+		if vm {
+			policy += "; worker-src 'self' blob:"
+			policy = strings.Replace(policy, "script-src 'self'", "script-src 'self' blob: 'wasm-unsafe-eval'", 1)
+		}
+		w.Header().Set("Content-Security-Policy", policy)
 		next.ServeHTTP(w, r)
 	})
 }

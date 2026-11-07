@@ -1,0 +1,67 @@
+:root { color-scheme: light; font-family: Arial, sans-serif; color: #172f32; background: #e8eeee; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+header { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 4vw; border-bottom: 1px solid #becbcb; font-size: .85rem; }
+a { color: #005b69; }
+main { max-width: 1060px; margin: 2.5rem auto; padding: 0 1rem; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.8rem); margin-bottom: .6rem; letter-spacing: -.04em; }
+p { line-height: 1.6; }
+.machine { margin-top: 2rem; background: silver; padding: 4px; box-shadow: inset 2px 2px white, inset -2px -2px #444, 8px 8px 0 #183a3a22; color: black; }
+.titlebar { display: flex; justify-content: space-between; gap: .5rem; background: linear-gradient(90deg, navy, #1084d0); color: white; font: bold 13px Arial, sans-serif; padding: 6px 8px; }
+.titlebar span { font-weight: normal; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 4px; }
+button { border: 0; border-radius: 0; background: silver; color: black; padding: 7px 12px; box-shadow: inset 1px 1px white, inset -1px -1px #404040, inset 2px 2px #dfdfdf, inset -2px -2px #808080; cursor: pointer; }
+button:disabled { color: #777; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 2px solid #005b69; outline-offset: 3px; }
+.vm-loader[hidden] { display: none; }
+.vm-loader { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 16px; background: #008080; }
+.loader-dialog { width: min(380px, 100%); padding: 3px; background: silver; color: black; box-shadow: inset 1px 1px white, inset -1px -1px #404040, inset 2px 2px #dfdfdf, inset -2px -2px #808080, 3px 3px 0 #0005; font: 13px Arial, sans-serif; }
+.loader-body { padding: 12px 16px; }
+.loader-body p { margin: 0 0 12px; line-height: 1.4; }
+.loader-body .loader-detail { margin: 12px 0 0; font-size: 12px; }
+.win98-progress { height: 23px; padding: 3px; overflow: hidden; box-shadow: inset 1px 1px #808080, inset -1px -1px white, inset 2px 2px #404040, inset -2px -2px #dfdfdf; }
+.win98-progress-fill { height: 100%; width: 0; background: repeating-linear-gradient(90deg, navy 0 9px, transparent 9px 12px); }
+.win98-progress[data-indeterminate="true"] .win98-progress-fill { width: 30%; animation: win98-loading 1.4s linear infinite; }
+@keyframes win98-loading { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+@media (prefers-reduced-motion: reduce) { .win98-progress[data-indeterminate="true"] .win98-progress-fill { animation: none; width: 100%; opacity: .65; } }
+.viewport { position: relative; background: #008080; min-width: 0; min-height: 480px; overflow: auto; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
+#screen-container { position: relative; line-height: normal; min-width: 0; max-width: 100%; }
+/* v86 supplies native pixel dimensions inline. Constrain only the rendered
+   canvas, never its backing resolution, and preserve the native aspect ratio. */
+.viewport:not(:fullscreen) canvas { max-width: 100%; height: auto !important; }
+.viewport:not(:fullscreen) .text-screen { max-width: 100%; overflow-x: auto; }
+#screen-container:focus-visible { outline: 2px dotted white; outline-offset: -2px; }
+.text-screen { white-space: pre; font: 14px monospace; }
+canvas { display: none; image-rendering: pixelated; }
+.statusbar { display: flex; justify-content: space-between; gap: 1rem; padding: 7px; font-size: 12px; box-shadow: inset 1px 1px #808080; }
+.hint, footer { font-size: .85rem; color: #476065; line-height: 1.6; }
+aside { padding: 1rem; border: 1px solid #b5c5c6; background: #f5f8f8; line-height: 1.6; margin: 1.5rem 0; }
+.vm-tools { margin: 1.5rem 0; padding: 1rem; border: 1px solid #b5c5c6; background: #f5f8f8; line-height: 1.6; }
+.vm-tools summary { cursor: pointer; font-weight: bold; }
+.vm-tools fieldset { min-width: 0; border: 1px solid #b5c5c6; }
+.vm-tools label { display: block; margin: .75rem 0; }
+.vm-tools input { max-width: 100%; }
+.vm-tools button { margin: .25rem; }
+.cd-drive { margin: 1.5rem 0; padding: 1.2rem; background: #d7d4c7; border: 2px solid; border-color: #fff #777 #777 #fff; color: #30332f; }
+.drive-face { position: relative; max-width: 430px; height: 110px; margin: 0 auto; overflow: hidden; border: 2px solid; border-color: #999 #eee #eee #999; background: #c8c5b7; }
+.drive-label { position: absolute; top: 10px; left: 16px; font: bold 12px monospace; letter-spacing: .1em; }
+.drive-slot { position: absolute; left: 8%; right: 8%; top: 40px; height: 12px; background: #292b28; box-shadow: 0 2px #eee; }
+.drive-led { position: absolute; right: 16px; top: 14px; width: 8px; height: 5px; background: #555b36; }
+.compact-disc { position: absolute; width: 108px; height: 108px; border-radius: 50%; left: calc(50% - 54px); top: 54px; background: conic-gradient(#ddd, #c0dedc, #e8cce8, #fafafa, #c7d6ef, #ddd); border: 1px solid #999; transform: translateY(70px); }
+.compact-disc::after { content: ''; position: absolute; left: 43px; top: 43px; width: 20px; height: 20px; border-radius: 50%; background: #c8c5b7; border: 3px solid #aaa; }
+.compact-disc span { display: block; text-align: center; padding-top: 16px; font: bold 11px monospace; color: #183a3a; }
+.cd-drive[data-state="inserting"] .compact-disc { animation: insert-disc 1.2s ease-in-out both; }
+.cd-drive[data-state="inserted"] .compact-disc { transform: translateY(-170px); }
+.cd-drive[data-state="loading"] .drive-led, .cd-drive[data-state="inserting"] .drive-led { background: #b6f25c; animation: drive-blink .4s steps(2) infinite; }
+.cd-drive[data-state="inserted"] .drive-led { background: #92be50; }
+.cd-drive p { margin: .75rem 0; }
+@keyframes insert-disc { from { transform: translateY(45px); } to { transform: translateY(-170px); } }
+@keyframes drive-blink { to { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .cd-drive .compact-disc, .cd-drive .drive-led { animation: none !important; } }
+#error { color: #9c2020; }
+.viewport:fullscreen { display: flex; align-items: center; justify-content: center; width: 100vw; height: 100vh; padding: 0; border: 0; background: #000; overflow: hidden; min-width: 0; min-height: 0; }
+.viewport:fullscreen #screen-container { flex: none; width: min(100vw, calc(100vh * var(--vm-aspect, 1.3333333333))); height: min(100vh, calc(100vw / var(--vm-aspect, 1.3333333333))); min-width: 0; min-height: 0; overflow: hidden; }
+/* Override v86's inline pixel sizes only in fullscreen. One contained box
+   controls both dimensions, so neither axis can overflow or stretch. */
+.viewport:fullscreen canvas { width: 100% !important; height: 100% !important; object-fit: contain; }
+@media (max-width: 650px) { header span, .titlebar span { display: none; } main { margin-top: 1.5rem; } .statusbar { flex-direction: column; gap: .3rem; } }

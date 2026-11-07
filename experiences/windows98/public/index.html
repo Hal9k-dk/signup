@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Windows 98 — hal9k</title>
+  <link rel="icon" href="/shared/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/libv86.js"></script>
+  <script defer src="install.js"></script>
+  <script defer src="handover.js"></script>
+  <script defer src="publishing.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header><a href="/">← Alle oplevelser</a><span>hal9k / Windows 98</span></header>
+  <main>
+    <h1>Vi fortsætter, hvor 1998 slap.</h1>
+    <p>En rigtig Windows 98-maskine i din browser. Vi gendanner hukommelsen — ingen opstart.</p>
+    <section class="machine" aria-label="Windows 98 virtuel maskine">
+      <div class="titlebar">hal9k.exe — Windows 98 <span>Snapshot preview</span></div>
+      <div class="toolbar">
+        <button id="pause" disabled>Pause</button>
+        <button id="restore" disabled>Gendan snapshot</button>
+        <button id="fullscreen" disabled>Fuld skærm</button>
+        <button id="mute" aria-pressed="false" disabled>Slå lyd fra</button>
+        <button id="release" disabled>Slip mus og tastatur (Esc)</button>
+      </div>
+      <div class="viewport" id="viewport" aria-busy="true">
+        <div class="vm-loader" id="vm-loader">
+          <div class="loader-dialog">
+            <div class="titlebar">Windows 98</div>
+            <div class="loader-body">
+              <p id="loader-label" role="status" aria-live="polite">Forbereder Windows 98…</p>
+              <div class="win98-progress" id="loader-progress" role="progressbar" aria-labelledby="loader-label" aria-valuemin="0" aria-valuemax="100" data-indeterminate="true"><div class="win98-progress-fill" id="loader-fill"></div></div>
+              <p class="loader-detail" id="loader-detail">Gendanner din gemte session — ingen Windows-opstart.</p>
+            </div>
+          </div>
+        </div>
+        <div id="screen-container" tabindex="0" role="application" aria-label="Windows 98 skrivebord. Klik for at fange mus og tastatur. Escape slipper begge.">
+          <div class="text-screen"></div>
+          <canvas hidden></canvas>
+        </div>
+      </div>
+      <div class="statusbar"><span id="status" role="status" aria-live="polite">Henter hukommelsessnapshot…</span><span>128 MB RAM</span></div>
+    </section>
+    <div class="cd-drive" id="cd-drive" data-state="waiting" aria-label="Virtuelt CD-ROM-drev">
+      <div class="drive-face" aria-hidden="true"><span class="drive-label">HAL9K · CD-ROM 24×</span><span class="drive-led"></span><div class="drive-slot"></div><div class="compact-disc"><span>HAL9K</span></div></div>
+      <p id="drive-status" role="status" aria-live="polite">Venter på Windows — CD'en indsættes automatisk.</p>
+      <button id="insert-bundled" type="button" disabled>Indsæt HAL9K-CD igen</button>
+    </div>
+    <p id="error" role="alert" hidden></p>
+    <button id="retry" hidden>Prøv igen</button>
+    <p class="hint">Klik på skrivebordet for at aktivere lyd og fange mus og tastatur. Musen bliver inde i maskinen, indtil du trykker Esc. Ændringer gemmes ikke; et nyt besøg starter fra samme snapshot.</p>
+    <details class="vm-tools" id="publishing-panel">
+      <summary>Publicering — lille snapshot og lazy-disk</summary>
+      <p>Eksportér først raw-overdragelse. Kør <code>node publish.cjs prepare HANDOVER.tar VERSION</code> lokalt, åbn <a href="?publish=1">publiceringskladden</a>, lad Windows starte, åbn det ønskede program og eksportér publiceringscapture. Kør derefter <code>node publish.cjs finalize CAPTURE.tar VERSION</code>, test den versionerede restore og aktivér først derefter.</p>
+      <p>En publiceringscapture medtager den oprindelige basisdisk og snapshot-overlays. Den sammenlagte disk er til videre udvikling, ikke basis for snapshot-gendannelse. Kladdeopstart er ikke visitor-startup.</p>
+    </details>
+    <details class="vm-tools" id="disk-panel">
+      <summary>Udvikl maskinen — indlæs raw-disk fra QEMU</summary>
+      <p><a href="?author=1">Åbn udviklingstilstand</a> · <a href="?">Tilbage til standard-snapshot</a>. Skift af tilstand kasserer ikke-eksporterede ændringer. Udviklingstilstand henter ikke demoens disk eller snapshot.</p>
+      <form id="disk-form" hidden>
+        <fieldset id="disk-controls">
+          <legend>Lokale filer — uploades ikke</legend>
+          <p>Installer Windows i QEMU og luk Windows og QEMU rent ned. SeaBIOS og VGA BIOS medfølger her og indlæses automatisk.</p>
+          <label>Komplet raw-harddisk (.img/.raw/.bin, maks. 1 GiB) <input id="disk-file" type="file" accept=".img,.raw,.bin" required></label>
+          <label>Valgfrit matchet v86-snapshot (.bin, maks. 1,5 GiB) <input id="disk-state-file" type="file" accept=".bin"></label>
+          <label>handover.json fra samme eksport (kræves med snapshot) <input id="disk-metadata-file" type="file" accept=".json"></label>
+          <p>Uden snapshot: normal opstart fra disk. Med snapshot og handover.json: checksums verificeres, og maskinen gendannes pauset. QEMU-snapshots og qcow2 accepteres ikke.</p>
+          <button type="submit">Indlæs maskine</button>
+        </fieldset>
+      </form>
+      <p id="disk-status" role="status" aria-live="polite">Installer OS i QEMU, indlæs raw-disken her, og gem et v86-snapshot til hurtig start.</p>
+      <p class="hint">Disken indlæses i RAM og ændres kun i denne session. Eksportér før lukning/genindlæsning. Brug disk.img, state.bin og handover.json fra samme overdragelse for at fortsætte udviklingen. Der kræves flere GiB ledig RAM; indlæs kun betroede filer uden personoplysninger.</p>
+    </details>
+    <details class="vm-tools">
+      <summary>VM-værktøjer — installer software og gem maskinen</summary>
+      <p>Vælg en ISO fra din computer, åbn CD-drevet i Windows og kopier eller installer programmet. Filerne uploades ikke til serveren. Genstart om nødvendigt via Start → Shut Down → Restart inde i Windows.</p>
+      <fieldset id="vm-tools" disabled>
+        <legend>Installations-CD</legend>
+        <p>HAL9K-CD'en indsættes automatisk i demo-tilstand (manuelt i udviklingstilstand) og indeholder HAL9K.EXE, AUTORUN.INF og README.TXT. Du kan også vælge din egen ISO her. <a href="downloads/hal9k-test.iso" download>Download HAL9K-CD</a> (valgfrit).</p>
+        <label>CD-image (.iso) <input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"></label>
+        <button id="mount-iso" type="button">Indsæt CD</button>
+        <button id="eject-iso" type="button">Skub CD ud</button>
+        <p id="cd-status">Ingen installations-CD valgt.</p>
+        <button id="ctrl-alt-del" type="button">Send Ctrl+Alt+Del</button>
+        <span id="author-reboot" hidden>
+          <button id="reboot-vm" type="button">Genstart VM (hård genstart)</button>
+          <p>Brug normalt Start → Shut Down → Restart inde i Windows. Hård genstart bevarer den virtuelle disk, men kan miste ikke-skrevne data og beskadige filsystemet. Genindlæs ikke websiden for at genstarte.</p>
+        </span>
+
+        <hr>
+        <p>Afslut installationen, vent på diskaktivitet og skub CD'en ud før eksport. Eksport sætter maskinen på pause og lader den være pauset. Overdragelsen gemmer et matchet disk/snapshot-par med checksums. Lazy-publicering medtager også den oprindelige basisdisk til snapshot-overlays.</p>
+        <button id="export-handover" type="button">Eksporter overdragelse — disk + snapshot (.tar)</button>
+        <p>Én download med disk.img, state.bin, firmware og kompatibilitetsoplysninger med checksums til genindlæsning. Standardens lazy-capture publiceres med finalize; raw-udviklingens capture kan genindlæses direkte med handover.json. Maskinen forbliver pauset. Pakken opdaterer ikke automatisk det publicerede master-image og kan kræve over 1 GiB RAM.</p>
+        <button id="save-state" type="button">Gem snapshot (.bin)</button>
+        <button id="export-disk" type="button">Eksporter harddisk (.img, 512 MiB)</button>
+        <label>Gendan eget snapshot (.bin) <input id="state-file" type="file" accept=".bin"></label>
+        <button id="load-state" type="button">Indlæs snapshot</button>
+      </fieldset>
+      <p id="tools-status" role="status" aria-live="polite">Værktøjerne bliver tilgængelige, når Windows er indlæst.</p>
+      <p class="hint">Ændringer er kun i denne browsersession. “Gendan snapshot” ovenfor eller genindlæsning nulstiller dem. Downloads ændrer ikke serverens master-image. Indlæs kun snapshots fra en betroet kilde med samme emulator og synkrone diskprofil. Snapshot-gendannelse erstatter også disken. Eksporter aldrig personoplysninger i et offentligt master-snapshot.</p>
+    </details>
+    <aside><strong>Teknisk preview.</strong> HAL9K-programmet starter fra CD via Windows AutoRun. Indtast ikke rigtige personoplysninger under test. Gæsten har ingen netværksforbindelse eller forbindelse til tilmeldings-API'et endnu.</aside>
+    <footer>Emulator: <a href="https://github.com/copy/v86">v86</a> · Disk og snapshot er vores egen QEMU/v86-forberedte Windows-installation og serveres lokalt. Windows 98 er proprietær Microsoft-software; demoens tilgængelighed giver ikke ret til redistribution.</footer>
+    <noscript>Windows 98-emulatoren kræver JavaScript og WebAssembly.</noscript>
+  </main>
+</body>
+</html>

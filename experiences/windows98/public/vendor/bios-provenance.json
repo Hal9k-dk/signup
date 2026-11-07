@@ -1,0 +1,15 @@
+{
+  "downloaded": "2026-11-06",
+  "sources": {
+    "seabios.bin": "https://copy.sh/v86/bios/seabios.bin",
+    "vgabios.bin": "https://copy.sh/v86/bios/vgabios.bin"
+  },
+  "sourceProject": "https://github.com/coreboot/seabios",
+  "note": "Firmware distributed by the v86 demo site. Exact source revision/build correspondence has not been verified. Preserve these binaries with the tested emulator; source and redistribution obligations should be reviewed before deployment.",
+  "licenses": ["SeaBIOS-LICENSE.txt", "BIOS-LICENSE-LESSER.txt"],
+  "size": {"seabios.bin": 131072, "vgabios.bin": 36352},
+  "sha256": {
+    "seabios.bin": "73e3f359102e3a9982c35fce98eb7cd08f18303ac7f1ba6ebfbe6cdc1c244d98",
+    "vgabios.bin": "a4bc0d80cc3ca028c73dafa8fee396b8d054ce87ebd8abfbd31b06b437607880"
+  }
+}

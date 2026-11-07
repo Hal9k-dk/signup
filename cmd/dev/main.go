@@ -47,5 +47,5 @@ func main() {
 		w.Header().Set("Cache-Control", "no-store")
 		frontend.ServeHTTP(w, r)
 	}))
-	run.Serve(site.Headers(mux), ":8080")
+	run.Serve(site.Headers(mux, *project), ":8080")
 }
