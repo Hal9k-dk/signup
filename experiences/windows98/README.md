@@ -1,6 +1,6 @@
 # Windows 98 — authored snapshot preview
 
-An independent v86 experience at `/experiences/windows98/`. The default page resumes the **user-authored Windows 98 master** from the selected compressed snapshot with a lazy 256 KiB disk backend. `public/images/published.json` selects this immutable version; the full synchronous master is retained only for authoring/rollback, not downloaded on normal visits. It never falls back to a cold boot or the old copy.sh Windows demo. After restoration it automatically inserts the HAL9K CD. Guest AutoRun may launch `HAL9K.EXE`; the page has no launch acknowledgement. The CD's `HAL9K.INI` configures the signup API through the virtual WISP network.
+An independent v86 experience at `/experiences/windows98/`. The default page resumes the **user-authored Windows 98 master** from the selected compressed snapshot with a lazy 256 KiB disk backend. `public/images/published.json` selects this immutable version. Raw disks and synchronous states are imported from local handover files in authoring mode, not bundled in the repository. It never falls back to a cold boot or the old copy.sh Windows demo. After restoration it automatically inserts the HAL9K CD. Guest AutoRun may launch `HAL9K.EXE`; the page has no launch acknowledgement. The CD's `HAL9K.INI` configures the signup API through the virtual WISP network.
 
 ## Repeatable fast-publishing pipeline
 
@@ -35,22 +35,13 @@ On a deployed site, inspect `/experiences/windows98/images/published.json` (or `
 
 Each immutable version contains `state.bin.zst`, on-demand 256 KiB base disk chunks and `manifest.json` with size/base/chunk/state/firmware/build hashes. The snapshot's disk-write overlays must remain paired with that exact base. Missing published assets do not silently fall back.
 
-## Retained raw authoring master
+## Local raw authoring and firmware
 
-Imported from `/tmp/hal9k-windows98-author-handover.tar`, created 2026-11-07:
+Raw disks and matched synchronous states belong in separately backed-up handover archives, not `public/images/` or Git history. Import them using `?author=1`; publish a new raw source using the prepare/capture/finalize workflow above. Existing lazy captures use finalize directly. Downloads from VM tools never update the server automatically.
 
-- `public/images/disk.img`: 512 MiB whole raw disk.
-- `public/images/state.bin`: 598,371,604-byte uncompressed v86 state (includes synchronous disk data).
-- `public/images/handover.json`: SHA-256 for disk/state/BIOS and hardware/build settings.
-- RAM: 128 MiB; VGA RAM: 8 MiB; IDE, ACPI disabled, boot order `0x132`.
-- BIOS: `public/seabios.bin`, `public/vgabios.bin`, verified against `public/vendor/bios-provenance.json`.
-- Emulator: pinned `public/vendor/libv86.js` + `v86.wasm`, hashes/licence/source URLs in `provenance.json`.
+RAM is 128 MiB, VGA RAM 8 MiB; IDE, ACPI disabled, boot order `0x132`. Bundled `seabios.bin` and `vgabios.bin` are verified against firmware provenance. The pinned v86 JS/Wasm hashes, licence and source URLs are in `public/vendor/provenance.json`.
 
-All default assets are same-origin. The loader verifies the matched pair before passing it to v86; missing/corrupt assets produce an error, not a replacement OS or cold boot. Startup has a 90-second deadline. The retained raw disk + synchronous state total about 1.06 GiB, but are no longer requested by the active lazy default. Full handover exports still need substantial RAM and transfer space.
-
-The old upstream snapshot, 1,200 disk chunks, checksum manifest and `fetch-images.cjs` have been removed. Do not restore them. These ignored proprietary master files must be preserved separately; the existing packager embeds the local public files on build.
-
-To publish another handover, verify its v2 synchronous profile, firmware and pinned v86 hashes, replace **all three** `images/disk.img`, `images/state.bin`, `images/handover.json`, then run offline and real browser checks before building. Keep a rollback copy. Downloads from the tools never update the server master automatically.
+All default assets are same-origin. Missing/invalid publishing pointers or assets produce an error, never a raw-disk fallback or replacement OS. Startup has a 90-second deadline. Full handover exports still need substantial RAM and transfer space. The old copy.sh assets and fetch script are removed; do not restore them.
 
 ## Development and export
 

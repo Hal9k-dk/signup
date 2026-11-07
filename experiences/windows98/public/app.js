@@ -416,8 +416,8 @@
       const response = await fetch("vendor/v86.wasm");
       if (!response.ok) throw new Error("Emulatorens WebAssembly-fil mangler.");
       const module = await WebAssembly.compile(await response.arrayBuffer());
-      // Load the user-authored synchronous disk/state pair, never the old
-      // upstream demo or a cold-boot fallback. Verify before v86 sees the data.
+      // Require a matched lazy publishing set for default startup.
+      // Raw authoring remains available through local file selection only.
       if (!authorMode) {
         let pointer = null;
         if (publishDraft) pointer = "publishing/draft.json";
@@ -429,30 +429,12 @@
           pointer = `publishing/${publishedVersion}/pointer.json`;
         } else {
           const response = await fetch("images/published.json", { signal: AbortSignal.timeout(30000) });
-          if (response.ok) { if (await response.json()) pointer = "images/published.json"; }
-          else if (response.status !== 404) throw new Error("Publiceringspointer kunne ikke læses.");
+          if (!response.ok) throw new Error("Publiceringspointer kunne ikke læses. Ingen alternativ disk eller opstart forsøges.");
+          pointer = "images/published.json";
         }
-        if (pointer) {
-          const loaded = await Win98Publishing.load(pointer, publishDraft, loading);
-          diskOptions = loaded.options;
-          publishingManifest = loaded.manifest;
-        } else {
-        status.textContent = "Henter HAL9K-disk og snapshot…";
-        const fetchAsset = async (url) => {
-          const response = await fetch(url, { signal: AbortSignal.timeout(85000) });
-          if (!response.ok) throw new Error(`Master-filen mangler: ${url} (HTTP ${response.status}).`);
-          return response;
-        };
-        const metadataText = await (await fetchAsset("images/handover.json")).text();
-        const disk = await (await fetchAsset("images/disk.img")).arrayBuffer();
-        const state = await (await fetchAsset("images/state.bin")).arrayBuffer();
-        const provenance = await (await fetchAsset("vendor/provenance.json")).json();
-        diskOptions = await Win98Disk.profile({
-          hda: { name: "disk.img", size: disk.byteLength, arrayBuffer: async () => disk },
-          state: { name: "state.bin", size: state.byteLength, arrayBuffer: async () => state },
-          metadata: { text: async () => metadataText },
-        }, await Win98Disk.firmware(), provenance);
-        }
+        const loaded = await Win98Publishing.load(pointer, publishDraft, loading);
+        diskOptions = loaded.options;
+        publishingManifest = loaded.manifest;
       }
       loading(authorMode || publishDraft ? "Indlæser maskinen…" : "Gendanner HAL9K-snapshot…");
       if (failed) return;

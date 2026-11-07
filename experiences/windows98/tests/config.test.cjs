@@ -7,27 +7,26 @@ const app = readFileSync(path.join(__dirname, "../public/app.js"), "utf8");
 test("default supports verified lazy publishing with no upstream fallback", () => {
   assert.match(app, /memory_size: 128 \* 1024 \* 1024/);
   assert.match(app, /vga_memory_size: 8 \* 1024 \* 1024/);
-  assert.match(app, /fetchAsset\("images\/disk.img"\)/);
-  assert.match(app, /fetchAsset\("images\/state.bin"\)/);
-  assert.match(app, /fetchAsset\("images\/handover.json"\)/);
+  assert.match(app, /Win98Publishing.load/);
+  assert.doesNotMatch(app, /images\/(disk\.img|state\.bin|handover\.json)/);
   assert.match(app, /\.\.\.diskOptions/);
   assert.match(app, /Win98Disk.profile/);
   assert.match(app, /autostart: false/);
   assert.doesNotMatch(app, /windows98_state-v2|use_parts|fixed_chunk_size|base-disk.img|https:\/\//);
 });
-test("local master matches handover checksums, hardware, firmware and pinned v86 build", () => {
+test("published hardware/firmware/build match and unused raw masters are absent", () => {
   const root = path.join(__dirname, "../public");
-  const manifest = JSON.parse(readFileSync(path.join(root, "images/handover.json"), "utf8"));
-  assert.equal(manifest.mode, "raw-authoring");
-  assert.equal(manifest.disk_backend, "synchronous-buffer");
-  assert.equal(manifest.disk_size, 512 * 1024 ** 2);
+  const pointer = JSON.parse(readFileSync(path.join(root, "images/published.json")));
+  const manifest = JSON.parse(readFileSync(path.join(root, pointer.manifest)));
+  assert.equal(manifest.disk_backend, "async-parts-with-overlay");
   assert.equal(manifest.memory_size, 128 * 1024 ** 2);
   assert.equal(manifest.vga_memory_size, 8 * 1024 ** 2);
+  assert.equal(manifest.boot_order, 0x132);
   assert.equal(manifest.acpi, false);
-  for (const [file, key] of [["images/disk.img", "disk_sha256"], ["images/state.bin", "state_sha256"],
-    ["seabios.bin", "bios_sha256"], ["vgabios.bin", "vga_bios_sha256"]]) {
+  for (const [file, key] of [["seabios.bin", "bios_sha256"], ["vgabios.bin", "vga_bios_sha256"]]) {
     assert.equal(createHash("sha256").update(readFileSync(path.join(root, file))).digest("hex"), manifest[key], file);
   }
+  for (const file of ["disk.img", "state.bin", "handover.json"]) assert(!existsSync(path.join(root, "images", file)));
   const vendor = JSON.parse(readFileSync(path.join(root, "vendor/provenance.json"), "utf8"));
   assert.deepEqual(manifest.v86_sha256, vendor.sha256);
   assert(!existsSync(path.join(root, "images/windows98")));
