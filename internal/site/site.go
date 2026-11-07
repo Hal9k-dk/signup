@@ -100,7 +100,13 @@ func Assemble(root, dest string) error {
 		if _, err := os.Stat(filepath.Join(root, entry.Project, "public", "index.html")); err != nil {
 			return fmt.Errorf("%s: %w", entry.ID, err)
 		}
-		if err := copyTree(filepath.Join(root, entry.Project, "public"), filepath.Join(dest, "experiences", entry.ID)); err != nil {
+		source := filepath.Join(root, entry.Project, "public")
+		target := filepath.Join(dest, "experiences", entry.ID)
+		if entry.ID == "windows98" {
+			if err := copyWindows98(source, target); err != nil {
+				return fmt.Errorf("windows98 assembly: %w", err)
+			}
+		} else if err := copyTree(source, target); err != nil {
 			return err
 		}
 	}
@@ -111,7 +117,72 @@ func Assemble(root, dest string) error {
 	return os.WriteFile(filepath.Join(dest, "experiences.json"), data, 0644)
 }
 
+// copyWindows98 packages only the immutable version selected by the pointer.
+// Raw authoring masters and alternate versions remain available to Live only.
+func copyWindows98(source, dest string) error {
+	data, err := os.ReadFile(filepath.Join(source, "images", "published.json"))
+	if err != nil {
+		return err
+	}
+	var pointer struct {
+		Manifest string `json:"manifest"`
+	}
+	if err := json.Unmarshal(data, &pointer); err != nil {
+		return err
+	}
+	if !regexp.MustCompile(`^publishing/[A-Za-z0-9_-]+/manifest\.json$`).MatchString(pointer.Manifest) {
+		return fmt.Errorf("invalid publishing pointer")
+	}
+	version := strings.Split(pointer.Manifest, "/")[1]
+	manifestPath := filepath.Join(source, filepath.FromSlash(pointer.Manifest))
+	data, err = os.ReadFile(manifestPath)
+	if err != nil {
+		return err
+	}
+	var manifest struct {
+		Format    string `json:"format"`
+		Backend   string `json:"disk_backend"`
+		State     string `json:"state"`
+		AssetRoot string `json:"asset_root"`
+	}
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return err
+	}
+	assetRoot := "publishing/" + version + "/"
+	if manifest.Format != "hal9k-windows98-publish-v1" || manifest.Backend != "async-parts-with-overlay" ||
+		manifest.AssetRoot != assetRoot || manifest.State != assetRoot+"state.bin.zst" {
+		return fmt.Errorf("selected release is not a finalized lazy snapshot")
+	}
+	if _, err := os.Stat(filepath.Join(source, filepath.FromSlash(manifest.State))); err != nil {
+		return err
+	}
+	return copyTreeFiltered(source, dest, func(rel string, entry fs.DirEntry) bool {
+		rel = filepath.ToSlash(rel)
+		if rel == "images" {
+			return true
+		}
+		if strings.HasPrefix(rel, "images/") {
+			return rel == "images/published.json"
+		}
+		if rel == "publishing" || rel == "publishing/"+version {
+			return true
+		}
+		if strings.HasPrefix(rel, "publishing/") {
+			if rel == pointer.Manifest || rel == manifest.State || rel == assetRoot+"disk" {
+				return true
+			}
+			return strings.HasPrefix(rel, assetRoot+"disk/") && !entry.IsDir() &&
+				regexp.MustCompile(`^[0-9]+-[0-9]+\.img$`).MatchString(filepath.Base(rel))
+		}
+		return true
+	})
+}
+
 func copyTree(source, dest string) error {
+	return copyTreeFiltered(source, dest, nil)
+}
+
+func copyTreeFiltered(source, dest string, include func(string, fs.DirEntry) bool) error {
 	return filepath.WalkDir(source, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -119,6 +190,12 @@ func copyTree(source, dest string) error {
 		rel, err := filepath.Rel(source, path)
 		if err != nil {
 			return err
+		}
+		if include != nil && !include(rel, entry) {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
 		}
 		target := filepath.Join(dest, rel)
 		if entry.Type()&os.ModeSymlink != 0 {

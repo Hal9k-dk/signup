@@ -64,7 +64,7 @@ The dev host proxies `/api/` to the supplied API URL. Same-origin requests mean 
 `make build` runs the Go packager, then `CGO_ENABLED=0 go build`:
 
 1. Validate `experiences.json` (safe IDs/paths and no duplicates).
-2. Collect landing `public/`, branding, and each registered project's `public/`.
+2. Collect landing `public/`, branding, and each registered project's `public/`. For Windows 98, package only the release selected by `public/images/published.json` (manifest, compressed snapshot and disk chunks), plus frontend/firmware/v86/CD assets. Exclude raw masters, drafts and inactive releases; live development still serves these local files.
 3. Write the assembled tree and catalogue into `cmd/server/embedded/`.
 4. Compile that tree into `bin/hal9k-signup` with `go:embed`.
 
