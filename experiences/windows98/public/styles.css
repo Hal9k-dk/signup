@@ -42,22 +42,51 @@ aside { padding: 1rem; border: 1px solid #b5c5c6; background: #f5f8f8; line-heig
 .vm-tools label { display: block; margin: .75rem 0; }
 .vm-tools input { max-width: 100%; }
 .vm-tools button { margin: .25rem; }
-.cd-drive { margin: 1.5rem 0; padding: 1.2rem; background: #d7d4c7; border: 2px solid; border-color: #fff #777 #777 #fff; color: #30332f; }
-.drive-face { position: relative; max-width: 430px; height: 110px; margin: 0 auto; overflow: hidden; border: 2px solid; border-color: #999 #eee #eee #999; background: #c8c5b7; }
-.drive-label { position: absolute; top: 10px; left: 16px; font: bold 12px monospace; letter-spacing: .1em; }
-.drive-slot { position: absolute; left: 8%; right: 8%; top: 40px; height: 12px; background: #292b28; box-shadow: 0 2px #eee; }
-.drive-led { position: absolute; right: 16px; top: 14px; width: 8px; height: 5px; background: #555b36; }
-.compact-disc { position: absolute; width: 108px; height: 108px; border-radius: 50%; left: calc(50% - 54px); top: 54px; background: conic-gradient(#ddd, #c0dedc, #e8cce8, #fafafa, #c7d6ef, #ddd); border: 1px solid #999; transform: translateY(70px); }
-.compact-disc::after { content: ''; position: absolute; left: 43px; top: 43px; width: 20px; height: 20px; border-radius: 50%; background: #c8c5b7; border: 3px solid #aaa; }
-.compact-disc span { display: block; text-align: center; padding-top: 16px; font: bold 11px monospace; color: #183a3a; }
-.cd-drive[data-state="inserting"] .compact-disc { animation: insert-disc 1.2s ease-in-out both; }
-.cd-drive[data-state="inserted"] .compact-disc { transform: translateY(-170px); }
-.cd-drive[data-state="loading"] .drive-led, .cd-drive[data-state="inserting"] .drive-led { background: #b6f25c; animation: drive-blink .4s steps(2) infinite; }
-.cd-drive[data-state="inserted"] .drive-led { background: #92be50; }
-.cd-drive p { margin: .75rem 0; }
-@keyframes insert-disc { from { transform: translateY(45px); } to { transform: translateY(-170px); } }
-@keyframes drive-blink { to { opacity: .3; } }
-@media (prefers-reduced-motion: reduce) { .cd-drive .compact-disc, .cd-drive .drive-led { animation: none !important; } }
+/* The CD library is deliberately separate from the desktop's chrome. */
+.cd-library { margin: 20px 0 32px; padding: 28px; color: #e9eee8; background: #192825; border: 1px solid #34463f; box-shadow: 6px 6px 0 #183a3a22; }
+.library-heading { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.library-eyebrow, .library-counter, .disc-number { font: 10px monospace; letter-spacing: .14em; color: #b6c8bc; }
+.library-heading h2 { font-size: clamp(20px, 3vw, 29px); letter-spacing: -.04em; font-weight: normal; margin: 8px 0 24px; }
+.library-counter { white-space: nowrap; border: 1px solid #52675a; padding: 7px; }
+.library-player { display: flex; align-items: center; gap: 26px; padding: 20px; margin-bottom: 24px; background: #101c19; border: 1px solid #35443c; }
+.library-mechanism { position: relative; width: 180px; height: 118px; flex: 0 0 180px; overflow: hidden; perspective: 400px; }
+.library-slot { position: absolute; top: 16px; left: 5px; right: 5px; height: 12px; background: #050a08; border: 1px solid #566558; box-shadow: 0 -7px 0 #303c33; }
+.library-tray { position: absolute; width: 154px; height: 98px; top: 25px; left: 13px; border: 3px solid #586152; border-radius: 0 0 14px 14px; background: #30392f; transform: translateY(-117px); transition: transform 1.1s cubic-bezier(.45,0,.2,1); }
+.tray-disc { width: 88px; height: 88px; margin: 2px auto; border-radius: 50%; background: conic-gradient(#d7dfd1,#c8afc3,#a2d4d0,#f1e4bc,#cbd3dd,#d7dfd1); position: relative; color: #15241d; display: grid; place-items: center; font: bold 10px monospace; }
+.tray-disc::after, .disc-art::after { content: ''; position: absolute; width: 14%; height: 14%; border-radius: 50%; background: #192825; border: 4px solid #aeb9af; left: 43%; top: 43%; }
+.tray-disc img { width: 100%; height: 100%; border-radius: 50%; }
+.library-led { position: absolute; width: 5px; height: 5px; background: #a4d76b; right: 8px; top: 5px; }
+.library-now p { margin: 5px 0; }
+#cd-status { font-size: 18px; }
+#drive-status { font-size: 12px; color: #b5c5b9; }
+.cd-library[data-state="ejecting"] .library-tray, .cd-library[data-state="empty"] .library-tray, .cd-library[data-state="waiting"] .library-tray { transform: translateY(0); }
+.cd-library[data-state="inserting"] .library-led, .cd-library[data-state="ejecting"] .library-led, .cd-library[data-state="loading"] .library-led { animation: library-blink .45s steps(2) infinite; }
+@keyframes library-blink { to { opacity: .2; } }
+.cd-library fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.cd-shelf { display: grid; grid-template-columns: repeat(auto-fill,minmax(185px,1fr)); gap: 16px; }
+.cd-library .disc-card { display: flex; flex-direction: column; align-items: stretch; text-align: left; min-width: 0; padding: 16px; gap: 9px; color: #e9eee8; background: #26372e; border: 1px solid #4a5b4e; box-shadow: none; transition: background .2s, border-color .2s; }
+.cd-library .disc-card:hover:not(:disabled) { background: #34493b; border-color: #d3e2be; }
+.cd-library .disc-card[aria-pressed="true"] { border-color: #c6df8b; background: #33452e; }
+.cd-library .disc-card:disabled { opacity: .55; }
+.disc-art { display: grid; place-items: center; position: relative; aspect-ratio: 1; width: 100%; max-width: 220px; align-self: center; border-radius: 50%; filter: drop-shadow(2px 6px 4px #0006); transition: transform .3s; }
+.disc-card:hover:not(:disabled) .disc-art { transform: rotate(-8deg) translateY(-3px); }
+.disc-card strong { font-size: 16px; font-weight: normal; }
+.disc-description { font-size: 12px; line-height: 1.5; color: #c0ccc1; flex: 1; }
+.disc-action { font: 11px monospace; color: #d1e6a3; padding-top: 8px; }
+#cd-collection-status { font-size: 12px; color: #b5c5b9; }
+.library-bottom { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #435346; }
+.local-disc { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-width: 0; }
+.local-disc label { width: 100%; font-size: 13px; }
+.local-disc label span { color: #b5c5b9; margin-left: 8px; font-size: 11px; }
+.local-disc input { max-width: 100%; width: 220px; font-size: 12px; }
+.library-footnote { font-size: 11px; color: #b5c5b9; margin: 20px 0 0; }
+.library-footnote code { overflow-wrap: anywhere; color: #d1e6a3; }
+#cd-collection-status:empty { display: none; }
+.cd-library a { color: #d1e6a3; }
+.cd-library button:focus-visible { outline: 2px solid #e6f4bd; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 650px) { .cd-library { padding: 16px; } .library-player { padding: 12px; gap: 12px; } .library-mechanism { width: 120px; flex-basis: 120px; } .library-tray { left: 0; width: 120px; } .library-counter { display: none; } .library-bottom { flex-direction: column; align-items: start; } .cd-shelf { grid-template-columns: repeat(auto-fill,minmax(145px,1fr)); gap: 10px; } }
+@media (prefers-reduced-motion: reduce) { .library-tray, .disc-art, .disc-card { transition: none !important; } .library-led { animation: none !important; } }
 #error { color: #9c2020; }
 .viewport:fullscreen { display: flex; align-items: center; justify-content: center; width: 100vw; height: 100vh; padding: 0; border: 0; background: #000; overflow: hidden; min-width: 0; min-height: 0; }
 .viewport:fullscreen #screen-container { flex: none; width: min(100vw, calc(100vh * var(--vm-aspect, 1.3333333333))); height: min(100vh, calc(100vw / var(--vm-aspect, 1.3333333333))); min-width: 0; min-height: 0; overflow: hidden; }

@@ -1,6 +1,6 @@
 # hal9k signup monorepo
 
-Independent signup experiences, one shared Go API, **one final executable containing every asset**, including the Windows 98 preview's locally stored disk and snapshot. No runtime Node, CDN, database or frontend build tool is needed. Windows 98 is proprietary and not licensed by v86; see `experiences/windows98/README.md` before distributing or deploying it.
+Independent signup experiences, one shared Go API, **one server and assembled asset tree**, packaged together in a container, including the Windows 98 preview's matched lazy disk/snapshot and CD library. No runtime Node, CDN, database or frontend build tool is needed. Windows 98 is proprietary and not licensed by v86; see `experiences/windows98/README.md` before distributing or deploying it.
 
 ## Quick start
 
@@ -8,8 +8,11 @@ Go 1.23+ and Make. Assembly/build/tests also require `xorriso` to regenerate the
 
 ```sh
 make dev             # http://localhost:8080; live source + real signup API
-make build           # bin/hal9k-signup, statically linked with all assets embedded
-./bin/hal9k-signup    # can run from anywhere, without this repository
+make build           # bin/hal9k-signup + bin/assets/
+./bin/hal9k-signup    # http://localhost:8080; finds assets beside the executable
+# Or build/run without installing Go or xorriso on the host:
+make container       # cached Podman build, localhost/hal9k-signup:dev
+make container-run   # http://localhost:8080
 ```
 
 Set `ADDR` to change the listen address. The development host serves source directly: edit HTML/CSS/JS and refresh. No packaging pass needed. Root `go run .` is intentionally replaced by explicit commands.
@@ -30,7 +33,7 @@ experiences.json               Assembly catalogue (ID, title, project directory)
 cmd/api/                       API-only process
 cmd/dev/                       Source-serving development host + optional API proxy
 cmd/package/                   Validates catalogue and assembles static assets
-cmd/server/                    Final server, embeds generated embedded/ directory
+cmd/server/                    Final server, serves assembled assets beside executable
 internal/site/                 Development/packaging infrastructure, not experience UI
 internal/run/                  Shared HTTP lifecycle and graceful shutdown
  tests/browser.cjs             Cross-project assembly smoke test only
@@ -59,22 +62,17 @@ API=http://localhost:8081 ADDR=:8090 make dev
 
 The dev host proxies `/api/` to the supplied API URL. Same-origin requests mean no CORS exceptions or API URL hardcoding in the experience. `api/` can be tested and run without any frontend assets.
 
-## Final single-binary packaging
+## Packaging
 
-`make build` runs the Go packager, then `CGO_ENABLED=0 go build`:
+`make build` regenerates the HAL9K CD, runs the Go packager, then builds a small static Go executable. Output is **`bin/hal9k-signup` plus `bin/assets/`**; keep these together when copying to another machine. The default asset path is relative to the executable, not your working directory. `ASSET_DIR=/absolute/path` overrides it. Missing assets fail startup rather than silently serving source.
 
-1. Validate `experiences.json` (safe IDs/paths and no duplicates).
-2. Collect landing `public/`, branding, and each registered project's `public/`. For Windows 98, package only the release selected by `public/images/published.json` (manifest, compressed snapshot and disk chunks), plus frontend/firmware/v86/CD assets. Exclude raw masters, drafts and inactive releases; live development still serves these local files.
-3. Write the assembled tree and catalogue into `cmd/server/embedded/`.
-4. Compile that tree into `bin/hal9k-signup` with `go:embed`.
+The CD library exceeds Go's multi-gigabyte compiler/object limits (`compile: data too large`), so assets are deliberately **not embedded**. The server streams static files from disk using the same origin, routes, browser headers and HTTP range support. No runtime Node or external asset service is needed.
 
-The final server serves the signup API and static embedded files. It reads **no frontend files or catalogue from disk at runtime**. `cmd/server/embedded/` is ignored generated output, never frontend source. `make clean` removes generated assets and binaries; `make build` regenerates them. Direct `go build ./cmd/server` does not regenerate assets: use `make build` (or `go generate ./cmd/server` first).
-
-Verified by copying only the executable to an unrelated directory and running browser tests against it.
+The packager validates `experiences.json`, gathers the independent static projects and writes `bin/assets/`. Windows 98 still packages only the release selected by `public/images/published.json` and its manifest: matched compressed state and async disk parts, plus frontend/firmware/pinned v86/CD assets. Raw masters, drafts and inactive VM releases are excluded. Live development is unchanged. Generated assets are ignored; `make clean` removes them. Direct `go build ./cmd/server` does not assemble assets; use `make build`.
 
 ## Container image
 
-The GitHub Actions container workflow runs `make test` on pull requests and pushes to `master`. After successful checks on `master` (or a manual run on `master`), it rebuilds the executable inside a multi-stage Docker build and pushes the same image to GHCR with both tags:
+The GitHub Actions container workflow runs `make test` on pull requests and pushes to `master`. After successful checks on `master` (or a manual run on `master`), it builds the server and assembled assets inside a multi-stage Docker build and pushes the same image to GHCR with both tags:
 
 ```text
 ghcr.io/hal9k-dk/signup:latest
@@ -85,12 +83,25 @@ Use the SHA tag for deployments tied to a specific commit; `latest` moves with s
 
 ```sh
 docker run --rm -p 8080:8080 ghcr.io/hal9k-dk/signup:latest
-# Or build and run locally:
-docker build -t hal9k-signup .
+# Or build and run locally (Podman):
+make container
+make container-run
+# Equivalent explicit run:
+podman run --rm -p 8080:8080 localhost/hal9k-signup:dev
+# Docker also works:
+make container CONTAINER_ENGINE=docker IMAGE=hal9k-signup
 docker run --rm -p 8080:8080 hal9k-signup
 ```
 
-The runtime image contains the static executable and HTTPS CA certificates, runs as a non-root user, and listens on port 8080 by default. It requires no volumes. Set `ADDR` if needed (and adjust the container port mapping). Images currently target `linux/amd64`.
+The runtime image contains the static executable, `/assets/` and HTTPS CA certificates, runs as a non-root user, and listens on port 8080 by default. It requires no volumes. Set `ADDR` if needed (and adjust the container port mapping). Images currently target `linux/amd64`.
+
+### Build cache and local iteration
+
+`make container` defaults to Podman with intermediate-layer caching enabled. Override `CONTAINER_ENGINE`, `IMAGE` or `PORT` as needed (`PORT` is used by `make container-run`). Build and run are separate: rebuilding does not replace a running container. Stop it, rebuild, then run again. The first build still copies the entire CD collection; lazy delivery saves browser traffic, not image size.
+
+The Dockerfile copies Go dependencies/code separately from frontend and multi-gigabyte media. The final image has a stable media layer followed by the frontend and server, so HTML/JS changes do not recompile Go or recopy CD data into a compiler. Changing media rebuilds its assembly layer. Only the pointer-selected VM release reaches the runtime image, even if inactive releases are present in the checkout. CI retains BuildKit's GitHub Actions cache; no publishing/deployment command is run by local Make targets.
+
+Build context copies are explicit (no `COPY . .`); `.env` files remain excluded. Local `container-run` passes no Slack credentials. Supply `--env-file .env` explicitly to `podman run` only when wanted. `make dev` remains the fastest frontend edit/refresh loop.
 
 ### Slack notifications and runtime secrets
 

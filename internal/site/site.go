@@ -5,6 +5,7 @@ package site
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -81,9 +82,17 @@ func Live(root, project string) (http.Handler, error) {
 	return mux, nil
 }
 
-// Assemble produces the exact static tree embedded by cmd/server. All present
-// projects are static public/ directories; introducing a build tool is optional.
+// Assemble produces the static tree served by cmd/server.
 func Assemble(root, dest string) error {
+	return assemble(root, dest, false)
+}
+
+// AssembleWeb omits immutable VM/CD media, allowing separate container layers.
+func AssembleWeb(root, dest string) error {
+	return assemble(root, dest, true)
+}
+
+func assemble(root, dest string, webOnly bool) error {
 	entries, err := Catalogue(root)
 	if err != nil {
 		return err
@@ -103,7 +112,11 @@ func Assemble(root, dest string) error {
 		source := filepath.Join(root, entry.Project, "public")
 		target := filepath.Join(dest, "experiences", entry.ID)
 		if entry.ID == "windows98" {
-			if err := copyWindows98(source, target); err != nil {
+			mode := "all"
+			if webOnly {
+				mode = "web"
+			}
+			if err := copyWindows98Filtered(source, target, mode); err != nil {
 				return fmt.Errorf("windows98 assembly: %w", err)
 			}
 		} else if err := copyTree(source, target); err != nil {
@@ -120,6 +133,10 @@ func Assemble(root, dest string) error {
 // copyWindows98 packages only the immutable version selected by the pointer.
 // Raw authoring masters and alternate versions remain available to Live only.
 func copyWindows98(source, dest string) error {
+	return copyWindows98Filtered(source, dest, "all")
+}
+
+func copyWindows98Filtered(source, dest, mode string) error {
 	data, err := os.ReadFile(filepath.Join(source, "images", "published.json"))
 	if err != nil {
 		return err
@@ -158,6 +175,9 @@ func copyWindows98(source, dest string) error {
 	}
 	return copyTreeFiltered(source, dest, func(rel string, entry fs.DirEntry) bool {
 		rel = filepath.ToSlash(rel)
+		if mode == "web" && (rel == "publishing" || rel == "cds") {
+			return false
+		}
 		if rel == "images" {
 			return true
 		}
@@ -174,8 +194,17 @@ func copyWindows98(source, dest string) error {
 			return strings.HasPrefix(rel, assetRoot+"disk/") && !entry.IsDir() &&
 				regexp.MustCompile(`^[0-9]+-[0-9]+\.img$`).MatchString(filepath.Base(rel))
 		}
-		return true
+		return mode != "media" || rel == "." || rel == "cds" || strings.HasPrefix(rel, "cds/")
 	})
+}
+
+// AssembleMedia selects the same matched release as Assemble, without frontend files.
+func AssembleMedia(root, dest string) error {
+	if err := os.RemoveAll(dest); err != nil {
+		return err
+	}
+	return copyWindows98Filtered(filepath.Join(root, "experiences/windows98/public"),
+		filepath.Join(dest, "experiences/windows98"), "media")
 }
 
 func copyTree(source, dest string) error {
@@ -204,11 +233,21 @@ func copyTreeFiltered(source, dest string, include func(string, fs.DirEntry) boo
 		if entry.IsDir() {
 			return os.MkdirAll(target, 0755)
 		}
-		data, err := os.ReadFile(path)
+		input, err := os.Open(path)
 		if err != nil {
 			return err
 		}
-		return os.WriteFile(target, data, 0644)
+		defer input.Close()
+		output, err := os.OpenFile(target, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(output, input)
+		closeErr := output.Close()
+		if err != nil {
+			return err
+		}
+		return closeErr
 	})
 }
 

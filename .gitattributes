@@ -1,3 +1,4 @@
+experiences/windows98/public/cds/**/*.iso filter=lfs diff=lfs merge=lfs -text
 experiences/windows98/public/images/*.img filter=lfs diff=lfs merge=lfs -text
 experiences/windows98/public/images/*.bin filter=lfs diff=lfs merge=lfs -text
 experiences/windows98/public/publishing/*/disk/*.img filter=lfs diff=lfs merge=lfs -text

@@ -1,4 +1,8 @@
-.PHONY: dev api assemble build test test-browser clean
+.PHONY: dev api assemble build container container-run test test-browser clean
+
+CONTAINER_ENGINE ?= podman
+IMAGE ?= localhost/hal9k-signup:dev
+PORT ?= 8080
 
 dev:
 	go run ./cmd/dev
@@ -13,6 +17,13 @@ assemble:
 build: assemble
 	mkdir -p bin
 	CGO_ENABLED=0 go build -trimpath -o bin/hal9k-signup ./cmd/server
+
+# Podman caches intermediate layers; Docker/CI uses the same Dockerfile.
+container:
+	$(CONTAINER_ENGINE) build $(if $(findstring podman,$(CONTAINER_ENGINE)),--layers) -t $(IMAGE) .
+
+container-run:
+	$(CONTAINER_ENGINE) run --rm -p $(PORT):8080 $(IMAGE)
 
 test: assemble
 	go test -race ./...
@@ -35,5 +46,3 @@ test-browser:
 
 clean:
 	rm -rf bin cmd/server/embedded
-	mkdir -p cmd/server/embedded
-	printf '%s\n' 'Run make assemble.' > cmd/server/embedded/placeholder.txt

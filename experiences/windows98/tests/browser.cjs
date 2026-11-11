@@ -7,6 +7,20 @@ const entry = base + (process.env.PUBLISHED_VERSION ? "?published=" + encodeURIC
   try {
     const page = await browser.newPage();
     await page.addInitScript(() => {
+      window.testEscapeCodes = [];
+      let wrappedV86;
+      Object.defineProperty(window, "V86", {
+        get: () => wrappedV86,
+        set: Real => { wrappedV86 = function (options) {
+          const emulator = new Real(options);
+          const send = emulator.keyboard_send_scancodes.bind(emulator);
+          emulator.keyboard_send_scancodes = (codes, ...args) => {
+            window.testEscapeCodes.push(Array.from(codes));
+            return send(codes, ...args);
+          };
+          return emulator;
+        }; },
+      });
       window.testAudioContexts = [];
       window.AudioContext = new Proxy(window.AudioContext, {
         construct(target, args) {
@@ -46,6 +60,10 @@ const entry = base + (process.env.PUBLISHED_VERSION ? "?published=" + encodeURIC
     await page.waitForFunction(() => !document.getElementById("insert-bundled").disabled);
     await page.waitForTimeout(3000);
     await page.screenshot({ path: process.env.SCREENSHOT || "/tmp/hal9k-windows98.png", fullPage: true });
+    assert.equal(await page.locator("#send-escape").isDisabled(), false);
+    await page.click("#send-escape");
+    assert.deepEqual(await page.evaluate(() => window.testEscapeCodes), [[0x01, 0x81]], "Toolbar Esc sends guest make/break scancodes without input capture");
+    assert.equal(await page.evaluate(() => document.pointerLockElement), null);
     assert.equal(await page.locator("#mute").isDisabled(), false);
     await page.click("#mute");
     assert.equal(await page.locator("#mute").getAttribute("aria-pressed"), "true");

@@ -1,0 +1,85 @@
+{
+  "format": "hal9k-cd-catalogue-v1",
+  "discs": [
+    {
+      "id": "windows98-se-da",
+      "title": "Windows 98 SE · Dansk",
+      "description": "Installationsmedie til Windows-komponenter og drivere. Når Windows beder om installationsfiler, prøv D:\\WIN98.",
+      "manifest": "windows98-se-da/33b509e690114dc48d85e7d5ba0f5d6e038b0ce6170ca556f19f48dee5dcacde-40cc82dcddd6b81af517c838dbc750b9651baa94d0bef8b1ac7e059bf0bd3df5/manifest.json",
+      "source": "User-supplied da_win98_se.iso and disc scan",
+      "rights": "Proprietary Microsoft OEM installation media; redistribution rights unverified."
+    },
+    {
+      "id": "alt-om-data-1999-08",
+      "title": "Alt om DATA · August 1999",
+      "description": "CorelDRAW 9, PhotoPaint 9, Cumulus og programmer fra bladets CD.",
+      "manifest": "alt-om-data-1999-08/89b2c1cba1194ce4adb3ec296f6edc30bc4bd4ce164eca92ae00d38ae736cfd5-8acbe33aff6dfa2e19c8cefe73c0244b662bf548f6b26e7959681a3983c4441b/manifest.json",
+      "source": "User-supplied /tmp/98media/1999-08 Alt om Data August 1999.iso and 1999-08 Alt om Data August 1999.jpg",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "alt-om-data-1999-09",
+      "title": "Alt om DATA · September 1999",
+      "description": "Caligari trueSpace, Adobe Premiere 5.0 og spillet Distant Suns.",
+      "manifest": "alt-om-data-1999-09/8fb604ee23c251f537a0c96f5f3bda625a85cc3d9ca9e9afe98fce9bcc4dd34e-ec2556c3f7bbdc5d9781a3b10244074c881a4db2e1430a5096d4d2d8b0449c87/manifest.json",
+      "source": "User-supplied /tmp/98media/1999-09 Alt om Data September 1999.iso and 1999-09 Alt om Data September 1999.jpg",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "alt-om-data-2000-02",
+      "title": "Alt om DATA · Februar 2000",
+      "description": "CoolEdit, Norton AntiVirus 2000 og demoer af Unreal Tournament og Quake 3 Arena.",
+      "manifest": "alt-om-data-2000-02/4e113296eb7aaba53e58e3b7675fe8d1486c06f2c16f656e8063ca67b154979f-56ef4b4e470f8f8492fb8c2067e50a0eab6f436e19b93d44b2b67815ae6a9b85/manifest.json",
+      "source": "User-supplied /tmp/98media/2000-02 Alt om Data Februar 2000.iso and 2000-02 Alt om Data Februar 2000.jpg",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "datatid-1998-05",
+      "title": "Datatid · Maj 1998",
+      "description": "Norton Utilities, internetprogrammer og spildemoer, bl.a. Outwars og Battlezone.",
+      "manifest": "datatid-1998-05/3d12395c91cc2c2526218da2835d2fb2195a8e0616be72239de89e18b07d064b-3bdf2b33e7118f82b760a8fb9ea1137aa3e99cef8c763845b1d259743710bbf4/manifest.json",
+      "source": "User-supplied /tmp/98media/Datatid-1998-05.iso and Datatid-1998-05.png; PNG scan converted to JPEG for display",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "datatid-2000-03",
+      "title": "Datatid · Marts 2000",
+      "description": "Pinnacle Studio, shareware og spildemoer fra Datatid 3/2000.",
+      "manifest": "datatid-2000-03/26f49f218dc75a8411e9f9b9acb41614a9a9eb77e5a0e1a6f096d47972ec147d-413a26a068e46c78c4a418b465dda68f4682261ea8cad666aebf78923cc75b3a/manifest.json",
+      "source": "User-supplied /tmp/98media/DATATID_MARTS_200001.iso and DATATID-MARTS-1-CD.jpg",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "komputer-internet-1997-05",
+      "title": "Komputer · Internet uden modem",
+      "description": "Internet uden modem · månedens K-diskette, nr. 5, maj 1997.",
+      "manifest": "komputer-internet-1997-05/9ff67abde89f0323aba6056f25d84bcc1b99ee5a6d69a4121652d9ca0a58a613-f853e0a20c8ff01b4854c4be8409925e807061300d1909c994a3a9423446687d/manifest.json",
+      "source": "User-supplied /tmp/98media/Internet CD01.iso and Internet CD01.jpg",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "komputer-1998-01",
+      "title": "Komputer · Januar 1998",
+      "description": "Månedens K-programmer, Moto Racer, Bust-A-Move og andre spildemoer.",
+      "manifest": "komputer-1998-01/2955d4173138e3cf202db92e6bf9fd7881bcccd99c582d892de76bb3561f2eca-0153edd8908618bdde21638143d60b3e5a27a6d603de1a45dd1a9f2c25c2a2a0/manifest.json",
+      "source": "User-supplied /tmp/98media/K-CD-1998-01.iso and K-CD-1998-01_Disc.png; PNG scan converted to JPEG for display",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "privat-computer-1998-01",
+      "title": "Privat Computer · Januar 1998",
+      "description": "Microsoft Publisher 97 i 60 dage, Wing Commander Prophecy-demo og shareware.",
+      "manifest": "privat-computer-1998-01/55b6f9a00d041e2be6a34293a2054c8666b84ce42535bacbc29547c39f564254-e9e1b360e0a2a3313a1a3c80dd66abc472f20f737cb577c9eb481ef24fecc861/manifest.json",
+      "source": "User-supplied /tmp/98media/PrivatComputer1998-01.iso and PrivatComputer1998-01.png; PNG scan converted to JPEG for display",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    },
+    {
+      "id": "privat-computer-1998-03",
+      "title": "Privat Computer · Marts 1998",
+      "description": "VisualAge for Java, Addiction Pinball-demo og programmer fra Privat Computer.",
+      "manifest": "privat-computer-1998-03/0a780a35a9ea67e202dc4edd0e790445968e520282bbf3331770ec91c0231b92-51d640dc0c92064b3431bef2eb48e9473e5fc06bb04cadbc5e986beec223faaa/manifest.json",
+      "source": "User-supplied /tmp/98media/PrivatComputer1998-03.iso and PrivatComputer1998-03Disc.png; PNG scan converted to JPEG for display",
+      "rights": "Magazine cover disc; third-party software and scan redistribution rights unverified."
+    }
+  ]
+}

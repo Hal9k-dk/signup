@@ -10,6 +10,7 @@
   <script defer src="install.js"></script>
   <script defer src="handover.js"></script>
   <script defer src="publishing.js"></script>
+  <script defer src="cds.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -22,6 +23,7 @@
         <button id="restore" disabled>Gendan snapshot</button>
         <button id="fullscreen" disabled>Fuld skærm</button>
         <button id="mute" aria-pressed="false" disabled>Slå lyd fra</button>
+        <button id="send-escape" title="Send Escape til Windows 98" disabled>Esc</button>
         <button id="release" disabled>Slip mus og tastatur (Esc)</button>
       </div>
       <div class="viewport" id="viewport" aria-busy="true">
@@ -42,11 +44,24 @@
       </div>
       <div class="statusbar"><span id="status" role="status" aria-live="polite">Henter hukommelsessnapshot…</span><span>128 MB RAM</span></div>
     </section>
-    <div class="cd-drive" id="cd-drive" data-state="waiting" aria-label="Virtuelt CD-ROM-drev">
-      <div class="drive-face" aria-hidden="true"><span class="drive-label">HAL9K · CD-ROM 24×</span><span class="drive-led"></span><div class="drive-slot"></div><div class="compact-disc"><span>HAL9K</span></div></div>
-      <p id="drive-status" role="status" aria-live="polite">Venter på Windows · CD'en indsættes automatisk.</p>
-      <button id="insert-bundled" type="button" disabled>Indsæt HAL9K-CD igen</button>
-    </div>
+    <section class="cd-library" id="cd-drive" data-state="waiting" aria-labelledby="library-title">
+      <div class="library-heading"><div><h2 id="library-title">Cdrom kartotek</h2></div><span class="library-counter">CD-ROM · D:</span></div>
+      <div class="library-player">
+        <div class="library-mechanism" aria-hidden="true"><div class="library-slot"></div><div class="library-tray"><div class="tray-disc" id="tray-disc"><span>HAL9K</span></div></div><span class="library-led"></span></div>
+        <div class="library-now"><span class="library-eyebrow">I DREVET</span><p id="cd-status">Intet medie</p><p id="drive-status" role="status" aria-live="polite">Venter på Windows…</p></div>
+      </div>
+      <fieldset id="cd-controls" disabled>
+        <legend class="sr-only">CD-bibliotek</legend>
+        <div id="cd-collection">
+          <div id="cd-shelf" class="cd-shelf">
+            <button id="insert-bundled" class="disc-card" type="button" data-cd-id="hal9k" aria-pressed="false" disabled><img class="disc-art" src="cds/hal9k-cd.png" alt="HAL9K Signup Version 1.0 CD"><span class="disc-number">01 / ORIGINAL</span><strong>HAL9K signup</strong><span class="disc-description">Tilbage til klubben. Medlemskab starter her.</span><span class="disc-action">Indsæt CD ↗</span></button>
+          </div>
+          <p id="cd-collection-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="library-bottom"><div class="local-disc"><label for="iso-file">Din egen samling <span>ISO-filer bliver på din computer.</span></label><input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"><button id="mount-iso" type="button">Indsæt lokal ISO</button></div><button id="eject-iso" type="button">⏏ Skub ud</button></div>
+      </fieldset>
+      <p class="library-footnote">Lav din egen CD fra en mappe med filer: <code>xorriso -as mkisofs -J -r -V MIN_CD -o min-cd.iso ./min-mappe</code>. Vælg derefter <code>min-cd.iso</code> ovenfor.</p>
+    </section>
     <p id="error" role="alert" hidden></p>
     <button id="retry" hidden>Prøv igen</button>
     <p class="hint">Klik på skrivebordet for at aktivere lyd og fange mus og tastatur. Musen bliver inde i maskinen, indtil du trykker Esc. Ændringer gemmes ikke; et nyt besøg starter fra samme snapshot.</p>
@@ -70,14 +85,8 @@
       <p id="disk-status" role="status" aria-live="polite">Installer OS i QEMU, indlæs raw-disken her, og gem et v86-snapshot til hurtig start.</p>
       <p class="hint">Disken indlæses i RAM og ændres kun i denne session. Eksportér før lukning/genindlæsning. Brug disk.img, state.bin og handover.json fra samme overdragelse for at fortsætte udviklingen. Der kræves flere GiB ledig RAM; indlæs kun betroede filer uden personoplysninger.</p>
       </details>
-      <p>Vælg en ISO fra din computer, åbn CD-drevet i Windows og kopier eller installer programmet. Filerne uploades ikke til serveren. Genstart om nødvendigt via Start → Shut Down → Restart inde i Windows.</p>
       <fieldset id="vm-tools" disabled>
-        <legend>Installations-CD</legend>
-        <p>HAL9K-CD'en indsættes automatisk i demo-tilstand (manuelt i udviklingstilstand) og indeholder HAL9K.EXE, HAL9K.INI, AUTORUN.INF og README.TXT. Du kan også vælge din egen ISO her. <a href="downloads/hal9k-test.iso" download>Download HAL9K-CD</a> (valgfrit).</p>
-        <label>CD-image (.iso) <input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"></label>
-        <button id="mount-iso" type="button">Indsæt CD</button>
-        <button id="eject-iso" type="button">Skub CD ud</button>
-        <p id="cd-status">Ingen installations-CD valgt.</p>
+        <legend>Maskine og eksport</legend>
         <button id="ctrl-alt-del" type="button">Send Ctrl+Alt+Del</button>
         <span id="author-reboot">
           <button id="reboot-vm" type="button">Genstart VM (hård genstart)</button>

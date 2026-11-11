@@ -33,6 +33,13 @@
     }
   }
   const release = document.getElementById("release");
+  const sendEscape = document.getElementById("send-escape");
+  sendEscape.addEventListener("click", () => {
+    if (!ready || failed || toolBusy || !emulator.is_running()) return;
+    // Direct scancodes bypass the host keyboard adapter: no input capture
+    // needed, and no DOM Escape event that would release pointer lock.
+    emulator.keyboard_send_scancodes([0x01, 0x81]);
+  });
   const retry = document.getElementById("retry");
   const mute = document.getElementById("mute");
   const tools = document.getElementById("vm-tools");
@@ -40,6 +47,7 @@
   const cdStatus = document.getElementById("cd-status");
   const drive = document.getElementById("cd-drive");
   const driveStatus = document.getElementById("drive-status");
+  const cdControls = document.getElementById("cd-controls");
   const insertBundled = document.getElementById("insert-bundled");
   function driveState(state, message) {
     drive.dataset.state = state;
@@ -137,8 +145,9 @@
     clearTimeout(timeout);
     releaseInput();
     emulator?.stop();
-    for (const button of [pause, restore, fullscreen, release, mute]) button.disabled = true;
+    for (const button of [pause, restore, fullscreen, release, sendEscape, mute]) button.disabled = true;
     tools.disabled = true;
+    cdControls.disabled = true;
     insertBundled.disabled = true;
     status.textContent = authorMode ? "Maskinen kunne ikke indlæses." : "Snapshot kunne ikke gendannes.";
     error.textContent = `Windows 98 kunne ikke indlæses. ${reason} ${authorMode ? "Genindlæs udviklingstilstand for at prøve igen." : "Ingen normal opstart forsøges."}`;
@@ -219,8 +228,9 @@
     if (!ready || failed || toolBusy) return;
     toolBusy = true;
     tools.disabled = true;
+    cdControls.disabled = true;
     insertBundled.disabled = true;
-    for (const button of [pause, restore, fullscreen, release, mute]) button.disabled = true;
+    for (const button of [pause, restore, fullscreen, release, sendEscape, mute]) button.disabled = true;
     releaseInput();
     try {
       await action();
@@ -229,12 +239,62 @@
     } finally {
       toolBusy = false;
       tools.disabled = failed;
+      cdControls.disabled = failed;
       insertBundled.disabled = failed;
       if (!failed) {
-        for (const button of [pause, restore, fullscreen, release]) button.disabled = false;
+        for (const button of [pause, restore, fullscreen, release, sendEscape]) button.disabled = false;
         mute.disabled = !emulator.speaker_adapter?.audio_context;
       }
     }
+  }
+  const settleCD = ms => new Promise(resolve => setTimeout(resolve, ms));
+  function discArtwork(disc) {
+    const tray = document.getElementById("tray-disc");
+    tray.replaceChildren();
+    if (disc.artwork) {
+      const image = document.createElement("img");
+      image.src = disc.artwork;
+      image.alt = "";
+      tray.append(image);
+    } else {
+      const label = document.createElement("span");
+      label.textContent = disc.id === "hal9k" ? "HAL9K" : "CD-ROM";
+      tray.append(label);
+    }
+  }
+  function selectDisc(id) {
+    for (const card of document.querySelectorAll("[data-cd-id]")) {
+      const selected = card.dataset.cdId === id;
+      card.setAttribute("aria-pressed", String(selected));
+      card.querySelector(".disc-action").textContent = selected ? "● I drevet" : "Indsæt CD ↗";
+    }
+  }
+  async function ejectCD() {
+    driveState("ejecting", "Skubber CD'en ud…");
+    emulator.eject_cdrom();
+    mountedISO = null;
+    selectDisc(null);
+    cdStatus.textContent = "Drevet er tomt";
+    // Real guest settling time, independent of decorative/reduced motion.
+    await settleCD(1800);
+    driveState("empty", "Klar til en ny skive.");
+  }
+  async function changeCD(media, disc) {
+    await ejectCD();
+    discArtwork(disc);
+    await settleCD(150);
+    driveState("inserting", `Indsætter ${disc.name}…`);
+    await settleCD(1200);
+    await emulator.set_cdrom(media);
+    const device = emulator.v86.cpu.devices.cdrom;
+    if (media.async) window.Win98CDs.protectReads(device.buffer);
+    window.Win98CDs.notifyChange(device);
+    mountedISO = disc;
+    cdStatus.textContent = disc.name;
+    selectDisc(disc.id);
+    driveState("settling", "Windows læser den nye CD…");
+    await settleCD(2000);
+    driveState("inserted", "Klar. Åbn CD-drevet D: i Windows.");
   }
   async function mountBundled() {
     driveState("loading", "Henter HAL9K-CD…");
@@ -243,17 +303,7 @@
       if (!response.ok) throw new Error(`CD-image kunne ikke hentes (HTTP ${response.status}).`);
       const bytes = await response.arrayBuffer();
       if (!bytes.byteLength || bytes.byteLength % 2048) throw new Error("CD-image er ugyldigt.");
-      // Let the restored shell settle before generating a media-change event.
-      // This is a real insertion, not keyboard automation or a simulated app.
-      driveState("inserting", "Indsætter HAL9K-CD…");
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        await new Promise(resolve => setTimeout(resolve, 1200));
-      }
-      emulator.eject_cdrom();
-      await emulator.set_cdrom({ buffer: bytes });
-      mountedISO = { name: "HAL9K-CD" };
-      cdStatus.textContent = "CD indsat: HAL9K-CD";
-      driveState("inserted", "HAL9K-CD indsat · Windows AutoRun starter programmet.");
+      await changeCD({ buffer: bytes }, {id:"hal9k", name:"HAL9K-CD", artwork:"cds/hal9k-cd.png"});
       toolsStatus.textContent = "HAL9K-CD indsat automatisk. Hvis AutoRun er slået fra, åbn D:\\HAL9K.EXE inde i Windows.";
     } catch (reason) {
       driveState("error", "CD'en kunne ikke indsættes. Prøv Indsæt HAL9K-CD igen.");
@@ -261,6 +311,52 @@
     }
   }
   insertBundled.addEventListener("click", () => toolAction(mountBundled));
+  async function loadCollection() {
+    const notice = document.getElementById("cd-collection-status");
+    notice.textContent = "Henter samlingen…";
+    try {
+      const discs = await window.Win98CDs.catalogue();
+      const shelf = document.getElementById("cd-shelf");
+      for (const [index, disc] of discs.entries()) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "disc-card";
+        button.dataset.cdId = disc.id;
+        button.setAttribute("aria-pressed", "false");
+        const image = document.createElement("img");
+        image.className = "disc-art";
+        image.src = disc.artwork;
+        image.alt = `CD: ${disc.title}`;
+        image.loading = "lazy";
+        const number = document.createElement("span");
+        number.className = "disc-number";
+        number.textContent = `${String(index + 2).padStart(2, "0")} / ARCHIVE`;
+        const title = document.createElement("strong");
+        title.textContent = disc.title;
+        const description = document.createElement("span");
+        description.className = "disc-description";
+        description.textContent = disc.description;
+        const action = document.createElement("span");
+        action.className = "disc-action";
+        action.textContent = "Indsæt CD ↗";
+        button.addEventListener("click", () => toolAction(async () => {
+          await changeCD(disc.options, {id:disc.id, name:disc.title, artwork:disc.artwork});
+          toolsStatus.textContent = "CD indsat. Installationsfiler ligger normalt i D:\\WIN98. Kun læste dele af CD'en hentes.";
+        }));
+        button.append(image, number, title, description, action);
+        shelf.append(button);
+      }
+      notice.textContent = "";
+    } catch (reason) {
+      notice.textContent = `Samlingen kunne ikke hentes: ${reason.message}`;
+      const retryCollection = document.createElement("button");
+      retryCollection.type = "button";
+      retryCollection.textContent = "Prøv igen";
+      retryCollection.addEventListener("click", loadCollection, {once:true});
+      notice.append(" ", retryCollection);
+    }
+  }
+  loadCollection();
   document.getElementById("mount-iso").addEventListener("click", () => toolAction(async () => {
     const file = document.getElementById("iso-file").files[0];
     if (!file || !/\.iso$/i.test(file.name) || !file.size || file.size % 2048 !== 0) {
@@ -270,18 +366,12 @@
     // cannot read it. Use the same synchronous buffer path as copy.sh.
     if (file.size > 800 * 1024 * 1024) throw new Error("ISO-filen er for stor (maks. 800 MiB). CD'en indlæses i browserens RAM.");
     toolsStatus.textContent = "Indlæser CD-image i hukommelsen…";
-    await emulator.set_cdrom({ buffer: await file.arrayBuffer() });
-    mountedISO = file;
-    driveState("inserted", `CD indsat: ${file.name}`);
-    cdStatus.textContent = `CD indsat: ${file.name}`;
-    toolsStatus.textContent = "Åbn CD-drevet i Windows (opdatér evt. Denne computer med F5).";
+    await changeCD({ buffer: await file.arrayBuffer() }, {id:"local", name:file.name});
+    toolsStatus.textContent = "Lokal CD indsat. Filen uploades ikke.";
   }));
   document.getElementById("eject-iso").addEventListener("click", () => toolAction(async () => {
-    emulator.eject_cdrom();
-    mountedISO = null;
-    driveState("empty", "CD-drevet er tomt.");
+    await ejectCD();
     document.getElementById("iso-file").value = "";
-    cdStatus.textContent = "CD skubbet ud.";
     toolsStatus.textContent = "CD-drevet er tomt.";
   }));
   document.getElementById("ctrl-alt-del").addEventListener("click", () => toolAction(async () => {
@@ -475,11 +565,12 @@
         loader.hidden = true;
         viewport.setAttribute("aria-busy", "false");
         tools.disabled = false;
+        cdControls.disabled = false;
         toolsStatus.textContent = "Klar. Vælg en ISO for at installere software i denne session.";
         screen.dataset.ready = "true";
         if (authorMode && diskOptions.initial_state) pause.textContent = "Fortsæt";
         else emulator.run();
-        for (const button of [pause, restore, fullscreen, release]) button.disabled = false;
+        for (const button of [pause, restore, fullscreen, release, sendEscape]) button.disabled = false;
         mute.disabled = !emulator.speaker_adapter?.audio_context;
         if (mute.disabled) mute.textContent = "Lyd ikke understøttet";
         status.textContent = authorMode

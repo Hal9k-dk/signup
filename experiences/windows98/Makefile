@@ -9,7 +9,21 @@ test:
 	node --check public/handover.js
 	node --check public/publishing.js
 	node --check publish.cjs
-	node --test tests/config.test.cjs tests/install.test.cjs tests/handover.test.cjs
+	node --check public/cds.js
+	node --check cd-import.cjs
+	node --test tests/config.test.cjs tests/install.test.cjs tests/handover.test.cjs tests/cd.test.cjs
+
+.PHONY: import-cd test-cd-browser
+# Usage: make import-cd ISO=/path/disc.iso ART=/path/disc.jpg CD_ID=magazine-issue
+import-cd:
+	node cd-import.cjs "$(ISO)" "$(ART)" "public/cds/$(CD_ID)"
+
+test-cd-browser:
+	node tests/cd-browser.cjs
+
+.PHONY: test-cd-video-browser
+test-cd-video-browser:
+	node tests/cd-video-browser.cjs
 
 test-browser:
 	node tests/browser.cjs

@@ -32,7 +32,8 @@ const base = (process.env.BASE_URL || "http://localhost:8080").replace(/\/$/, ""
     await page.click("#save-state");
     await page.waitForFunction(() => document.getElementById("tools-status").textContent.includes("Skub CD"));
     await page.click("#eject-iso");
-    await page.waitForFunction(() => document.getElementById("cd-status").textContent.includes("skubbet"));
+    await page.waitForSelector('#cd-drive[data-state="empty"]');
+    await page.waitForFunction(() => !document.getElementById("cd-controls").disabled);
     async function download(button, name) {
       const pending = page.waitForEvent("download", { timeout: 120000 });
       await page.click(button);
