@@ -264,6 +264,14 @@ func Headers(next http.Handler, project ...string) http.Handler {
 		if vm {
 			policy += "; worker-src 'self' blob:"
 			policy = strings.Replace(policy, "script-src 'self'", "script-src 'self' blob: 'wasm-unsafe-eval'", 1)
+			// Raw sectors can start with HTML, images, fonts or plain text.
+			// FileServer's content sniffing would expose them to CDN rewriting
+			// (e.g. injected HTML scripts), corrupting v86's fixed-size reads.
+			switch strings.ToLower(filepath.Ext(r.URL.Path)) {
+			case ".img", ".iso", ".bin", ".zst":
+				w.Header().Set("Content-Type", "application/octet-stream")
+				w.Header().Set("Cache-Control", "no-transform")
+			}
 		}
 		w.Header().Set("Content-Security-Policy", policy)
 		next.ServeHTTP(w, r)
