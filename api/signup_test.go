@@ -28,6 +28,7 @@ func TestSignupValidation(t *testing.T) {
 		{"future date", func(s *signup) { s.BirthDate = "01-01-2999" }, "birthDate"},
 		{"membership", func(s *signup) { s.Membership = "robot" }, "membership"},
 		{"message size", func(s *signup) { s.Message = strings.Repeat("x", 4001) }, "message"},
+		{"experience size", func(s *signup) { s.Experience = strings.Repeat("x", 65) }, "experience"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			s := validSignup()
@@ -44,6 +45,43 @@ func TestSignupValidation(t *testing.T) {
 	s.Membership = "student"
 	if errs := s.validate(); len(errs) != 0 {
 		t.Fatalf("student signup rejected: %v", errs)
+	}
+}
+
+func TestSignupExperience(t *testing.T) {
+	for _, experience := range []string{"frontpage98", "physics", "survey", "terminal", "windows98", "", strings.Repeat("x", 64), strings.Repeat("x", 65)} {
+		t.Run(experience, func(t *testing.T) {
+			var logs bytes.Buffer
+			handler := newHandler(slog.New(slog.NewJSONHandler(&logs, nil)), nil)
+			input := validSignup()
+			input.Experience = experience
+			payload, err := json.Marshal(input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			req := httptest.NewRequest("POST", "/api/signup", bytes.NewReader(payload))
+			req.Header.Set("Content-Type", "application/json")
+			res := httptest.NewRecorder()
+			handler.ServeHTTP(res, req)
+			if len(experience) > 64 {
+				if res.Code != 422 || logs.Len() != 0 || !strings.Contains(res.Body.String(), `"experience"`) {
+					t.Fatalf("status=%d body=%s logs=%s", res.Code, res.Body.String(), logs.String())
+				}
+				return
+			}
+			if res.Code != 200 {
+				t.Fatalf("status=%d body=%s", res.Code, res.Body.String())
+			}
+			var entry struct {
+				Signup signup `json:"signup"`
+			}
+			if err := json.Unmarshal(logs.Bytes(), &entry); err != nil {
+				t.Fatal(err)
+			}
+			if entry.Signup.Experience != experience {
+				t.Fatalf("experience missing from log: %s", logs.String())
+			}
+		})
 	}
 }
 

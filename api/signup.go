@@ -22,6 +22,7 @@ type signup struct {
 	Phone      string `json:"phone"`
 	Membership string `json:"membership"`
 	Message    string `json:"message"`
+	Experience string `json:"experience"`
 }
 
 func (s signup) validate() map[string]string {
@@ -49,6 +50,9 @@ func (s signup) validate() map[string]string {
 	}
 	if s.Membership != "ordinary" && s.Membership != "student" {
 		errs["membership"] = "Vælg en medlemstype."
+	}
+	if len(s.Experience) > 64 {
+		errs["experience"] = "Brug højst 64 bytes."
 	}
 	if len(s.Message) > 4000 {
 		errs["message"] = "Beskeden må højst fylde 4000 bytes."

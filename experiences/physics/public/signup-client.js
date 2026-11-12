@@ -7,7 +7,7 @@ export async function submitSignup(form) {
     const response = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), experience: "physics" }),
       signal: controller.signal,
     });
     const result = await response.json();

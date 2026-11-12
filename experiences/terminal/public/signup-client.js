@@ -6,7 +6,7 @@ export async function submitSignup(payload) {
     const response = await fetch('/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, experience: 'terminal' }),
       signal: controller.signal,
     });
     let result;

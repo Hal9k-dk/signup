@@ -28,6 +28,7 @@ container-run:
 test: assemble
 	go test -race ./...
 	go vet ./...
+	node --test tests/signup-clients.test.cjs
 	$(MAKE) -C landing test
 	$(MAKE) -C experiences/physics test
 	$(MAKE) -C experiences/frontpage98 test

@@ -1,8 +1,10 @@
 {
   "repository": "https://github.com/Hal9k-dk/hal9k-signup-win98",
-  "commit": "f0572db99d16e691d606bd87a0efa69427e3f479",
-  "build": "make (upstream Makefile, i686-w64-mingw32-gcc -march=i386, -nostdlib)",
+  "commit": null,
+  "build": "User-supplied prebuilt executable from /tmp/hal9k.exe; source commit and build command not supplied",
+  "sha256": "f513bf09ba6ac54529c1639260b91a5aab11bc91e377e56d446a3cdb9da47ae5",
+  "previous_commit": "f0572db99d16e691d606bd87a0efa69427e3f479",
   "configuration": "test-cd/HAL9K.INI: http://192.168.86.2/api/signup",
   "output": "test-cd/hal9k.exe",
-  "note": "No upstream source changes. No webhook credentials included. Regenerate public/downloads/hal9k-test.iso with make test-iso."
+  "note": "Replaces the previous upstream build. Source/build provenance and guest execution of this supplied binary have not been independently verified. Regenerate public/downloads/hal9k-test.iso with make test-iso."
 }

@@ -78,6 +78,36 @@ func TestSlackDelivery(t *testing.T) {
 	}
 }
 
+func TestSlackSignupExperience(t *testing.T) {
+	for _, experience := range []string{"terminal", "windows98", ""} {
+		t.Run(experience, func(t *testing.T) {
+			var text string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var payload struct {
+					Text string `json:"text"`
+				}
+				if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+					t.Error(err)
+				}
+				text = payload.Text
+			}))
+			defer server.Close()
+			input := validSignup()
+			input.Experience = experience
+			if err := slackNotifier(server.URL, server.Client())(context.Background(), input); err != nil {
+				t.Fatal(err)
+			}
+			want := experience
+			if want == "" {
+				want = "Not provided"
+			}
+			if !strings.Contains(text, "\nExperience: "+want+"\n") {
+				t.Fatalf("missing experience: %q", text)
+			}
+		})
+	}
+}
+
 type failingTransport struct{}
 
 func (failingTransport) RoundTrip(r *http.Request) (*http.Response, error) {

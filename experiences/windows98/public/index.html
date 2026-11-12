@@ -46,19 +46,19 @@
     </section>
     <section class="cd-library" id="cd-drive" data-state="waiting" aria-labelledby="library-title">
       <div class="library-heading"><div><h2 id="library-title">Cdrom kartotek</h2></div><span class="library-counter">CD-ROM · D:</span></div>
+      <fieldset id="cd-controls" disabled>
+        <legend class="sr-only">CD-bibliotek</legend>
       <div class="library-player">
         <div class="library-mechanism" aria-hidden="true"><div class="library-slot"></div><div class="library-tray"><div class="tray-disc" id="tray-disc"><span>HAL9K</span></div></div><span class="library-led"></span></div>
         <div class="library-now"><span class="library-eyebrow">I DREVET</span><p id="cd-status">Intet medie</p><p id="drive-status" role="status" aria-live="polite">Venter på Windows…</p></div>
+        <div class="library-manual"><div class="local-disc"><label for="iso-file">Din egen samling <span>ISO-filer bliver på din computer.</span></label><input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"><button id="mount-iso" type="button">Indsæt lokal ISO</button></div><button id="eject-iso" type="button">⏏ Skub ud</button></div>
       </div>
-      <fieldset id="cd-controls" disabled>
-        <legend class="sr-only">CD-bibliotek</legend>
         <div id="cd-collection">
           <div id="cd-shelf" class="cd-shelf">
             <button id="insert-bundled" class="disc-card" type="button" data-cd-id="hal9k" aria-pressed="false" disabled><img class="disc-art" src="cds/hal9k-cd.png" alt="HAL9K Signup Version 1.0 CD"><span class="disc-number">01 / ORIGINAL</span><strong>HAL9K signup</strong><span class="disc-description">Tilbage til klubben. Medlemskab starter her.</span><span class="disc-action">Indsæt CD ↗</span></button>
           </div>
           <p id="cd-collection-status" role="status" aria-live="polite"></p>
         </div>
-        <div class="library-bottom"><div class="local-disc"><label for="iso-file">Din egen samling <span>ISO-filer bliver på din computer.</span></label><input id="iso-file" type="file" accept=".iso,application/x-iso9660-image"><button id="mount-iso" type="button">Indsæt lokal ISO</button></div><button id="eject-iso" type="button">⏏ Skub ud</button></div>
       </fieldset>
       <p class="library-footnote">Lav din egen CD fra en mappe med filer: <code>xorriso -as mkisofs -J -r -V MIN_CD -o min-cd.iso ./min-mappe</code>. Vælg derefter <code>min-cd.iso</code> ovenfor.</p>
     </section>
@@ -105,7 +105,7 @@
       <p id="tools-status" role="status" aria-live="polite">Værktøjerne bliver tilgængelige, når Windows er indlæst.</p>
       <p class="hint">Ændringer er kun i denne browsersession. “Gendan snapshot” ovenfor eller genindlæsning nulstiller dem. Downloads ændrer ikke serverens master-image. Indlæs kun snapshots fra en betroet kilde med samme emulator og synkrone diskprofil. Snapshot-gendannelse erstatter også disken. Eksporter aldrig personoplysninger i et offentligt master-snapshot.</p>
     </details>
-    <footer>Emulator: <a href="https://github.com/copy/v86">v86</a> · Disk og snapshot er vores egen QEMU/v86-forberedte Windows-installation og serveres lokalt. Windows 98 er proprietær Microsoft-software; demoens tilgængelighed giver ikke ret til redistribution.</footer>
+    <footer>Emulator: <a href="https://github.com/copy/v86">v86</a> · Medierne er hentet fra <a href="https://archive.org/">archive.org</a>. Disk og snapshot er vores egen QEMU/v86-forberedte Windows-installation og serveres lokalt. Windows 98 er proprietær Microsoft-software; demoens tilgængelighed giver ikke ret til redistribution.</footer>
     <noscript>Windows 98-emulatoren kræver JavaScript og WebAssembly.</noscript>
   </main>
 </body>

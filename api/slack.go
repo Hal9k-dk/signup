@@ -18,8 +18,12 @@ type signupNotifier func(context.Context, signup) error
 
 func slackNotifier(webhook string, client *http.Client) signupNotifier {
 	return func(ctx context.Context, input signup) error {
-		text := fmt.Sprintf("New signup\nName: %s %s\nEmail: %s\nAddress: %s, %s %s\nBirth date: %s\nPhone: %s\nMembership: %s\nMessage: %s",
-			input.FirstName, input.LastName, input.Email, input.Street, input.PostalCode,
+		experience := input.Experience
+		if experience == "" {
+			experience = "Not provided"
+		}
+		text := fmt.Sprintf("New signup\nExperience: %s\nName: %s %s\nEmail: %s\nAddress: %s, %s %s\nBirth date: %s\nPhone: %s\nMembership: %s\nMessage: %s",
+			experience, input.FirstName, input.LastName, input.Email, input.Street, input.PostalCode,
 			input.City, input.BirthDate, input.Phone, input.Membership, input.Message)
 		payload, err := json.Marshal(struct {
 			Text   string `json:"text"`

@@ -106,7 +106,7 @@ The local source file is never modified; all guest writes stay in browser RAM. W
 
 Click the display to unlock browser audio and capture mouse/keyboard with Pointer Lock. Escape, release, pause, blur and hiding the tab release input. Muting, fullscreen and aspect-preserving narrow-page scaling are supported. Networking is enabled by default through the same-origin WISP gateway described below. No persistent disk storage is attached.
 
-`public/downloads/hal9k-test.iso` (volume `HAL9K_TEST`) contains `HAL9K.EXE`, `HAL9K.INI`, `AUTORUN.INF`, `README.TXT` from `test-cd/`. Default visits insert it automatically; authoring offers manual insertion. If AutoRun is disabled, run `D:\HAL9K.EXE`. A failed CD fetch leaves Windows usable with retry. Root `make assemble`/`make build` regenerate the ISO using xorriso; standalone `make test-iso` does the same.
+`public/downloads/hal9k-test.iso` (volume `HAL9K_TEST`) contains `HAL9K.EXE`, `HAL9K.INI`, `AUTORUN.INF`, `README.TXT` and `GUIDE.PDF` from `test-cd/`. `GUIDE.PDF` is the bundled [HAL9K survival guide (2024-05-21)](https://hal9k.dk/wp-content/uploads/2024/05/overlevelsesguide-hal9k-2024-05-21.pdf), stored locally in the repository and included automatically on every ISO build without a network download. Default visits insert it automatically; authoring offers manual insertion. If AutoRun is disabled, run `D:\HAL9K.EXE`. A failed CD fetch leaves Windows usable with retry. Root `make assemble`/`make build` regenerate the ISO using xorriso; standalone `make test-iso` does the same.
 
 ```sh
 make dev                  # standalone Go dev host at /

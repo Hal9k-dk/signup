@@ -83,7 +83,8 @@ const data = {
     const payload = (await request).postDataJSON();
     assert.equal(payload.firstName, "Ada");
     assert.equal(payload.membership, "student");
-    assert.equal(Object.keys(payload).length, 10);
+    assert.equal(payload.experience, "survey");
+    assert.equal(Object.keys(payload).length, 11);
     assert(!("currentTime" in payload));
     await page.waitForFunction(
       () => !document.querySelector("#success").hidden,
