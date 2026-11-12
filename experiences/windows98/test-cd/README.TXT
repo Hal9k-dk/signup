@@ -1,6 +1,7 @@
 HAL9K SIGNUP CD
 ===============
 
+SONG.MP3 contains the survival-guide song (supplied as overlevelsesguide.mp3).
 GUIDE.PDF contains the HAL9K survival guide (2024-05-21).
 Source: https://hal9k.dk/wp-content/uploads/2024/05/overlevelsesguide-hal9k-2024-05-21.pdf
 
